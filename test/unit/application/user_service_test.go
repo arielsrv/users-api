@@ -3,6 +3,7 @@ package application
 import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
+	"github.com/users-api/src/application"
 	"github.com/users-api/src/domain"
 	"testing"
 )
@@ -10,7 +11,7 @@ import (
 type UserServiceUnitTestSuite struct {
 	suite.Suite
 	userRepository *MockUserRepository
-	userService    *UserService
+	userService    *application.UserService
 }
 
 type MockUserRepository struct {
@@ -23,7 +24,7 @@ func TestUnit(t *testing.T) {
 
 func (suite *UserServiceUnitTestSuite) SetupTest() {
 	suite.userRepository = new(MockUserRepository)
-	suite.userService = NewUserService(suite.userRepository)
+	suite.userService = application.NewUserService(suite.userRepository)
 }
 
 func (mock *MockUserRepository) GetUser(id int) *domain.User {
