@@ -2,6 +2,8 @@ package common
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"github.com/users-api/src/infrastructure"
 	"reflect"
 )
@@ -18,7 +20,7 @@ type WebServer struct {
 	app *fiber.App
 }
 
-func (server WebServer) GetWebServer() *fiber.App {
+func (server *WebServer) GetWebServer() *fiber.App {
 	return server.app
 }
 
@@ -27,15 +29,21 @@ type WebServerBuilder struct {
 }
 
 func NewWebServerBuilder() *WebServerBuilder {
-
-	routes := make(map[string]string)
-	routes["*infrastructure.UserController"] = "/users/:id"
-
 	return &WebServerBuilder{
 		app: fiber.New(fiber.Config{
-			AppName: "users-api",
+			AppName:           "users-api",
+			Prefork:           true,
+			EnablePrintRoutes: true,
 		}),
 	}
+}
+
+func (builder *WebServerBuilder) EnableLog() *WebServerBuilder {
+	builder.app.Use(requestid.New())
+	builder.app.Use(logger.New(logger.Config{
+		Format: "${pid} ${locals:requestid} ${status} - ${method} ${path}\n",
+	}))
+	return builder
 }
 
 func (builder *WebServerBuilder) AddRouteGetUserById(controller infrastructure.IUserController) *WebServerBuilder {

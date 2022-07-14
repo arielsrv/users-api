@@ -12,10 +12,11 @@ func main() {
 
 	builder := common.NewWebServerBuilder()
 	_ = builder.
+		EnableLog().
 		AddRouteGetUserById(userController).
 		Build().
 		GetWebServer().
-		Listen("127.0.0.1:3000")
+		Listen(":3000")
 }
 
 func GetUserController() *infrastructure.UserController {
