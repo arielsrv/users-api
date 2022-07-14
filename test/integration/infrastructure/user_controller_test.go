@@ -5,6 +5,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"github.com/users-api/src/application"
+	"github.com/users-api/src/common"
 	"github.com/users-api/src/infrastructure"
 	"io/ioutil"
 	"net/http"
@@ -25,23 +26,20 @@ type MockUserService struct {
 }
 
 func (suite *UserControllerIntegrationSuite) SetupTest() {
-	suite.app = fiber.New()
 	suite.userService = new(MockUserService)
 	suite.userController = infrastructure.NewUserController(suite.userService)
-	suite.app.Get("/users/:id", func(ctx *fiber.Ctx) error {
-		var userDto = suite.userController.GetUser(ctx)
-		return ctx.JSON(userDto)
-	})
+
+	builder := common.NewWebServerBuilder()
+	suite.app = builder.
+		AddRouteGetUserById(suite.userController).
+		Build().
+		GetWebServer()
 }
 
-func (suite *UserControllerIntegrationSuite) TearDownTest() {
-	suite.app.Shutdown()
-}
-
-func (mock *MockUserService) GetUser(id int) application.UserDto {
+func (mock *MockUserService) GetUser(int) *application.UserDto {
 	args := mock.Called()
 	result := args.Get(0)
-	return result.(application.UserDto)
+	return result.(*application.UserDto)
 }
 
 func TestIntegration(t *testing.T) {
@@ -61,8 +59,8 @@ func (suite *UserControllerIntegrationSuite) Test_Get_User_By_Id() {
 	suite.Equal(`{"id":1,"name":"John Doe","email":"john@doe.com"}`, string(body))
 }
 
-func GetUser() application.UserDto {
-	return application.UserDto{
+func GetUser() *application.UserDto {
+	return &application.UserDto{
 		Id:    1,
 		Name:  "John Doe",
 		Email: "john@doe.com",

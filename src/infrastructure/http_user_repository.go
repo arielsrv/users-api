@@ -5,7 +5,7 @@ import "github.com/users-api/src/domain"
 type HttpUserRepository struct {
 }
 
-func NewUserRepository() *HttpUserRepository {
+func NewHttpUserRepository() *HttpUserRepository {
 	return &HttpUserRepository{}
 }
 

@@ -1,8 +1,26 @@
 package main
 
-func main() {
-	app := NewWebServer().
-		GetWebServer()
+import (
+	"github.com/users-api/src/application"
+	"github.com/users-api/src/common"
+	"github.com/users-api/src/infrastructure"
+)
 
-	app.Listen(":3000")
+func main() {
+
+	userController := GetUserController()
+
+	builder := common.NewWebServerBuilder()
+	_ = builder.
+		AddRouteGetUserById(userController).
+		Build().
+		GetWebServer().
+		Listen("127.0.0.1:3000")
+}
+
+func GetUserController() *infrastructure.UserController {
+	userRepository := infrastructure.NewHttpUserRepository()
+	userService := application.NewUserService(userRepository)
+	userController := infrastructure.NewUserController(userService)
+	return userController
 }
