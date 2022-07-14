@@ -9,7 +9,7 @@ func NewHttpUserRepository() *HttpUserRepository {
 	return &HttpUserRepository{}
 }
 
-func (repository HttpUserRepository) GetUser(userId int) domain.User {
+func (repository HttpUserRepository) GetUser(userId int) *domain.User {
 	user := domain.User{Id: userId, Name: "Steve Jobs", Email: "stevejobs@apple.com"}
-	return user
+	return &user
 }
