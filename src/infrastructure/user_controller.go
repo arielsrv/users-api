@@ -29,7 +29,7 @@ func (userController UserController) GetUser(ctx *fiber.Ctx) *application.UserDt
 		GetUser(userId)
 }
 
-func (userController UserController) GetUsers(ctx *fiber.Ctx) []application.UserDto {
+func (userController UserController) GetUsers(*fiber.Ctx) []application.UserDto {
 	return userController.
 		userService.
 		GetUsers()

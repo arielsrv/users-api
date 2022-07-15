@@ -26,7 +26,9 @@ func (repository HttpUserRepository) GetUser(userId int) *domain.User {
 		log.Fatal(err)
 	}
 	if response.StatusCode == http.StatusOK {
-		defer response.Body.Close()
+		defer func(Body io.ReadCloser) {
+			_ = Body.Close()
+		}(response.Body)
 		body, _ := io.ReadAll(response.Body)
 		user := domain.User{}
 		_ = json.Unmarshal(body, &user)
@@ -42,7 +44,9 @@ func (repository HttpUserRepository) GetUsers() []domain.User {
 		log.Fatal(err)
 	}
 	if response.StatusCode == http.StatusOK {
-		defer response.Body.Close()
+		defer func(Body io.ReadCloser) {
+			_ = Body.Close()
+		}(response.Body)
 		body, _ := io.ReadAll(response.Body)
 		var users []domain.User
 		_ = json.Unmarshal(body, &users)
