@@ -10,19 +10,22 @@ import (
 
 func main() {
 
-	userController := GetUserController()
-
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "3000"
 	}
+
+	controllers := common.NewControllers(
+		GetUserController(),
+	)
 
 	builder := common.NewWebServerBuilder()
 	_ = builder.
 		EnableRecover().
 		EnableNewRelic().
 		EnableLog().
-		AddRouteGetUserById(userController).
+		AddControllers(controllers).
+		AddRoutes().
 		Build().
 		GetWebServer().
 		Listen(":" + port)

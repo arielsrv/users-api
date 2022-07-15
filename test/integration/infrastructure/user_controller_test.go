@@ -16,10 +16,9 @@ import (
 
 type UserControllerIntegrationSuite struct {
 	suite.Suite
-	app            *fiber.App
-	userController *infrastructure.UserController
-	userService    *MockUserService
-	port           string
+	app         *fiber.App
+	userService *MockUserService
+	port        string
 }
 
 type MockUserService struct {
@@ -28,11 +27,12 @@ type MockUserService struct {
 
 func (suite *UserControllerIntegrationSuite) SetupTest() {
 	suite.userService = new(MockUserService)
-	suite.userController = infrastructure.NewUserController(suite.userService)
-
 	builder := common.NewWebServerBuilder()
 	suite.app = builder.
-		AddRouteGetUserById(suite.userController).
+		AddControllers(common.NewControllers(
+			infrastructure.NewUserController(suite.userService),
+		)).
+		AddRoutes().
 		Build().
 		GetWebServer()
 }

@@ -9,19 +9,18 @@ import (
 	"github.com/nobuyo/nrfiber"
 	"github.com/users-api/src/infrastructure"
 	"os"
-	"reflect"
-)
-
-var (
-	routes = struct {
-		path map[string]string
-	}{path: map[string]string{
-		"*infrastructure.UserController": "/users/:id",
-	}}
 )
 
 type WebServer struct {
 	app *fiber.App
+}
+
+type Controllers struct {
+	userController *infrastructure.UserController
+}
+
+func NewControllers(userController *infrastructure.UserController) *Controllers {
+	return &Controllers{userController: userController}
 }
 
 func (server *WebServer) GetWebServer() *fiber.App {
@@ -29,7 +28,8 @@ func (server *WebServer) GetWebServer() *fiber.App {
 }
 
 type WebServerBuilder struct {
-	app *fiber.App
+	app         *fiber.App
+	controllers *Controllers
 }
 
 func NewWebServerBuilder() *WebServerBuilder {
@@ -72,11 +72,16 @@ func (builder *WebServerBuilder) EnableNewRelic() *WebServerBuilder {
 	return builder
 }
 
-func (builder *WebServerBuilder) AddRouteGetUserById(controller infrastructure.IUserController) *WebServerBuilder {
-	builder.app.Get(routes.path[reflect.TypeOf(controller).String()], func(ctx *fiber.Ctx) error {
-		userDto := controller.GetUser(ctx)
+func (builder *WebServerBuilder) AddRoutes() *WebServerBuilder {
+	builder.app.Get("/users/:id", func(ctx *fiber.Ctx) error {
+		userDto := builder.controllers.userController.GetUser(ctx)
 		return ctx.JSON(userDto)
 	})
+	return builder
+}
+
+func (builder *WebServerBuilder) AddControllers(controllers *Controllers) *WebServerBuilder {
+	builder.controllers = controllers
 	return builder
 }
 
