@@ -1,11 +1,11 @@
 package application_test
 
 import (
+	"github.com/users-api/src/application"
 	"testing"
 
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
-	"github.com/users-api/src/application"
 	"github.com/users-api/src/domain"
 )
 

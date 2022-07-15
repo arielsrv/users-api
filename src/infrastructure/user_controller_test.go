@@ -1,6 +1,7 @@
 package infrastructure_test
 
 import (
+	"github.com/users-api/src/infrastructure"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -11,7 +12,6 @@ import (
 	"github.com/stretchr/testify/suite"
 	"github.com/users-api/src/application"
 	"github.com/users-api/src/common"
-	"github.com/users-api/src/infrastructure"
 )
 
 type UserControllerIntegrationSuite struct {
