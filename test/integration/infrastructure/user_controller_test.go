@@ -1,16 +1,17 @@
-package infrastructure
+package infrastructure_test
 
 import (
+	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"github.com/users-api/src/application"
 	"github.com/users-api/src/common"
 	"github.com/users-api/src/infrastructure"
-	"io/ioutil"
-	"net/http"
-	"net/http/httptest"
-	"testing"
 )
 
 type UserControllerIntegrationSuite struct {

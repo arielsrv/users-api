@@ -3,6 +3,7 @@ package common
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"github.com/users-api/src/infrastructure"
 	"reflect"
@@ -32,10 +33,18 @@ func NewWebServerBuilder() *WebServerBuilder {
 	return &WebServerBuilder{
 		app: fiber.New(fiber.Config{
 			AppName:           "users-api",
-			Prefork:           true,
+			Prefork:           false,
 			EnablePrintRoutes: true,
 		}),
 	}
+}
+
+func (builder *WebServerBuilder) EnableRecover() *WebServerBuilder {
+	var config = recover.Config{
+		EnableStackTrace: true,
+	}
+	builder.app.Use(recover.New(config))
+	return builder
 }
 
 func (builder *WebServerBuilder) EnableLog() *WebServerBuilder {

@@ -4,6 +4,7 @@ import (
 	"github.com/users-api/src/application"
 	"github.com/users-api/src/common"
 	"github.com/users-api/src/infrastructure"
+	"net/http"
 )
 
 func main() {
@@ -12,6 +13,7 @@ func main() {
 
 	builder := common.NewWebServerBuilder()
 	_ = builder.
+		EnableRecover().
 		EnableLog().
 		AddRouteGetUserById(userController).
 		Build().
@@ -20,7 +22,8 @@ func main() {
 }
 
 func GetUserController() *infrastructure.UserController {
-	userRepository := infrastructure.NewHttpUserRepository()
+	userHttpClient := &http.Client{}
+	userRepository := infrastructure.NewHttpUserRepository(userHttpClient)
 	userService := application.NewUserService(userRepository)
 	userController := infrastructure.NewUserController(userService)
 	return userController

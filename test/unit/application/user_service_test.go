@@ -1,11 +1,12 @@
-package application
+package application_test
 
 import (
+	"testing"
+
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"github.com/users-api/src/application"
 	"github.com/users-api/src/domain"
-	"testing"
 )
 
 type UserServiceUnitTestSuite struct {

@@ -1,15 +1,36 @@
 package infrastructure
 
-import "github.com/users-api/src/domain"
+import (
+	"encoding/json"
+	"github.com/users-api/src/domain"
+	"io"
+	"log"
+	"net/http"
+	"strconv"
+)
 
 type HttpUserRepository struct {
+	client *http.Client
 }
 
-func NewHttpUserRepository() *HttpUserRepository {
-	return &HttpUserRepository{}
+func NewHttpUserRepository(client *http.Client) *HttpUserRepository {
+	return &HttpUserRepository{
+		client: client,
+	}
 }
 
 func (repository HttpUserRepository) GetUser(userId int) *domain.User {
-	user := domain.User{Id: userId, Name: "Steve Jobs", Email: "stevejobs@apple.com"}
-	return &user
+	url := "https://gorest.co.in/public/v2/users/" + strconv.Itoa(userId)
+	response, err := repository.client.Get(url)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if response.StatusCode == http.StatusOK {
+		defer response.Body.Close()
+		body, _ := io.ReadAll(response.Body)
+		user := domain.User{}
+		_ = json.Unmarshal(body, &user)
+		return &user
+	}
+	return nil
 }
