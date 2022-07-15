@@ -5,11 +5,17 @@ import (
 	"github.com/users-api/src/common"
 	"github.com/users-api/src/infrastructure"
 	"net/http"
+	"os"
 )
 
 func main() {
 
 	userController := GetUserController()
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "3000"
+	}
 
 	builder := common.NewWebServerBuilder()
 	_ = builder.
@@ -18,7 +24,7 @@ func main() {
 		AddRouteGetUserById(userController).
 		Build().
 		GetWebServer().
-		Listen(":3000")
+		Listen(":" + port)
 }
 
 func GetUserController() *infrastructure.UserController {
