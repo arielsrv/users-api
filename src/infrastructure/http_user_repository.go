@@ -34,3 +34,19 @@ func (repository HttpUserRepository) GetUser(userId int) *domain.User {
 	}
 	return nil
 }
+
+func (repository HttpUserRepository) GetUsers() []domain.User {
+	url := "https://gorest.co.in/public/v2/users/"
+	response, err := repository.client.Get(url)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if response.StatusCode == http.StatusOK {
+		defer response.Body.Close()
+		body, _ := io.ReadAll(response.Body)
+		var users []domain.User
+		_ = json.Unmarshal(body, &users)
+		return users
+	}
+	return nil
+}

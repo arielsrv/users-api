@@ -8,6 +8,7 @@ import (
 
 type IUserController interface {
 	GetUser(ctx *fiber.Ctx) *application.UserDto
+	GetUsers(ctx *fiber.Ctx) []application.UserDto
 }
 
 type UserController struct {
@@ -26,4 +27,10 @@ func (userController UserController) GetUser(ctx *fiber.Ctx) *application.UserDt
 	return userController.
 		userService.
 		GetUser(userId)
+}
+
+func (userController UserController) GetUsers(ctx *fiber.Ctx) []application.UserDto {
+	return userController.
+		userService.
+		GetUsers()
 }

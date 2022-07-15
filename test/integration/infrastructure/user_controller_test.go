@@ -43,6 +43,12 @@ func (mock *MockUserService) GetUser(int) *application.UserDto {
 	return result.(*application.UserDto)
 }
 
+func (mock *MockUserService) GetUsers() []application.UserDto {
+	args := mock.Called()
+	result := args.Get(0)
+	return result.([]application.UserDto)
+}
+
 func TestIntegration(t *testing.T) {
 	suite.Run(t, new(UserControllerIntegrationSuite))
 }
@@ -58,6 +64,34 @@ func (suite *UserControllerIntegrationSuite) Test_Get_User_By_Id() {
 	suite.NoError(err)
 	suite.Equal(http.StatusOK, response.StatusCode)
 	suite.Equal(`{"id":1,"name":"John Doe","email":"john@doe.com"}`, string(body))
+}
+
+func (suite *UserControllerIntegrationSuite) Test_Get_Users() {
+	suite.userService.On("GetUsers").Return(GetUsers())
+
+	request := httptest.NewRequest("GET", "/users", nil)
+	response, err := suite.app.Test(request)
+	body, _ := ioutil.ReadAll(response.Body)
+
+	suite.NotNil(response)
+	suite.NoError(err)
+	suite.Equal(http.StatusOK, response.StatusCode)
+	suite.Equal(`[{"id":1,"name":"John Doe","email":"john@doe.com"},{"id":2,"name":"John Foo","email":"john@foo.com"}]`, string(body))
+}
+
+func GetUsers() []application.UserDto {
+	usersDto := make([]application.UserDto, 2)
+	usersDto[0] = application.UserDto{
+		Id:    1,
+		Name:  "John Doe",
+		Email: "john@doe.com",
+	}
+	usersDto[1] = application.UserDto{
+		Id:    2,
+		Name:  "John Foo",
+		Email: "john@foo.com",
+	}
+	return usersDto
 }
 
 func GetUser() *application.UserDto {

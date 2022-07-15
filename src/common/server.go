@@ -77,6 +77,10 @@ func (builder *WebServerBuilder) AddRoutes() *WebServerBuilder {
 		userDto := builder.controllers.userController.GetUser(ctx)
 		return ctx.JSON(userDto)
 	})
+	builder.app.Get("/users", func(ctx *fiber.Ctx) error {
+		usersDto := builder.controllers.userController.GetUsers(ctx)
+		return ctx.JSON(usersDto)
+	})
 	return builder
 }
 
