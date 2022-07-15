@@ -10,12 +10,12 @@ import (
 )
 
 type HttpUserRepository struct {
-	client *http.Client
+	client HttpClient
 }
 
-func NewHttpUserRepository(client *http.Client) *HttpUserRepository {
+func NewHttpUserRepository(httpClient HttpClient) *HttpUserRepository {
 	return &HttpUserRepository{
-		client: client,
+		client: httpClient,
 	}
 }
 
