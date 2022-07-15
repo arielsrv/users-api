@@ -20,6 +20,7 @@ func main() {
 	builder := common.NewWebServerBuilder()
 	_ = builder.
 		EnableRecover().
+		EnableNewRelic().
 		EnableLog().
 		AddRouteGetUserById(userController).
 		Build().

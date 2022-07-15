@@ -5,7 +5,10 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
+	"github.com/newrelic/go-agent/v3/newrelic"
+	"github.com/nobuyo/nrfiber"
 	"github.com/users-api/src/infrastructure"
+	"os"
 	"reflect"
 )
 
@@ -52,6 +55,20 @@ func (builder *WebServerBuilder) EnableLog() *WebServerBuilder {
 	builder.app.Use(logger.New(logger.Config{
 		Format: "${pid} ${locals:requestid} ${status} - ${method} ${path}\n",
 	}))
+	return builder
+}
+
+func (builder *WebServerBuilder) EnableNewRelic() *WebServerBuilder {
+	nrapp, _ := newrelic.NewApplication(
+		newrelic.ConfigAppName("golang-users-api"),
+		newrelic.ConfigLicense(os.Getenv("NEW_RELIC_LICENSE_KEY")),
+		newrelic.ConfigDebugLogger(os.Stdout),
+	)
+
+	builder.app.Use(nrfiber.New(nrfiber.Config{
+		NewRelicApp: nrapp,
+	}))
+
 	return builder
 }
 
