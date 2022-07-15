@@ -1,9 +1,9 @@
-.PHONY: build
+.PHONY: bin
 .PHONY: coverage
 
 build:
-	mkdir -p build
-	go build -o build ./...
+	mkdir -p bin
+	go build -o bin ./...
 
 test:
 	go test ./...
@@ -19,7 +19,7 @@ upgrade:
 	go-mod-upgrade
 
 clean:
-	rm -rf build
+	rm -rf bin
 	rm -rf coverage
 
 all:
