@@ -18,18 +18,12 @@ func NewUserService(userRepository domain.UserRepository) *UserService {
 
 func (service UserService) GetUser(id int) (*UserDto, error) {
 	user, err := service.userRepository.GetUser(id)
-	if err != nil {
-		return nil, err
-	}
 	userDto := UserDto{Id: user.Id, Name: user.Name, Email: user.Email}
-	return &userDto, nil
+	return &userDto, err
 }
 
 func (service UserService) GetUsers() ([]UserDto, error) {
-	users, err := service.userRepository.GetUsers()
-	if err != nil {
-		return nil, err
-	}
+	users, _ := service.userRepository.GetUsers()
 	var usersDto = make([]UserDto, len(users))
 
 	for i, user := range users {

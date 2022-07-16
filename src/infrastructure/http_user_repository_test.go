@@ -90,6 +90,31 @@ func (suite *HttpUserRepositoryUnitSuite) TestGet_InternalServerError() {
 	}
 }
 
+func (suite *HttpUserRepositoryUnitSuite) TestGetUsers_NotFound() {
+	suite.client.On("Get").Return(GetNotFound())
+
+	actual, err := suite.userRepository.GetUsers()
+
+	suite.Nil(actual)
+	suite.Error(err)
+	if e, ok := err.(*fiber.Error); ok {
+		suite.Equal(http.StatusNotFound, e.Code)
+	}
+}
+
+func (suite *HttpUserRepositoryUnitSuite) TestGetUsers_InternalServerError() {
+	suite.errorClient.On("Get").Return(&http.Response{})
+
+	actual, err := suite.userErrorRepository.GetUsers()
+
+	suite.Nil(actual)
+	suite.Error(err)
+	if e, ok := err.(*fiber.Error); ok {
+		suite.Equal(http.StatusInternalServerError, e.Code)
+		suite.Equal("A error has ocurred. ", e.Message)
+	}
+}
+
 func (suite *HttpUserRepositoryUnitSuite) TestGetAll() {
 	suite.client.On("Get").Return(GetAll())
 
