@@ -15,15 +15,17 @@ import (
 
 type HttpUserRepositoryUnitSuite struct {
 	suite.Suite
-	client         *MockClient
-	userRepository *HttpUserRepository
-	errorClient    *MockErrorClient
+	client              *MockClient
+	userRepository      *HttpUserRepository
+	errorClient         *MockErrorClient
+	userErrorRepository *HttpUserRepository
 }
 
 func (suite *HttpUserRepositoryUnitSuite) SetupTest() {
 	suite.client = new(MockClient)
 	suite.errorClient = new(MockErrorClient)
 	suite.userRepository = NewHttpUserRepository(suite.client)
+	suite.userErrorRepository = NewHttpUserRepository(suite.errorClient)
 }
 
 func TestUnit(t *testing.T) {
@@ -78,9 +80,7 @@ func (suite *HttpUserRepositoryUnitSuite) TestGet_NotFound() {
 func (suite *HttpUserRepositoryUnitSuite) TestGet_InternalServerError() {
 	suite.errorClient.On("Get").Return(&http.Response{})
 
-	userRepository := NewHttpUserRepository(suite.errorClient)
-
-	actual, err := userRepository.GetUser(1)
+	actual, err := suite.userErrorRepository.GetUser(1)
 
 	suite.Nil(actual)
 	suite.Error(err)
