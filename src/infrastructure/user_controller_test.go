@@ -66,6 +66,17 @@ func (suite *UserControllerIntegrationSuite) Test_Get_User_By_Id() {
 	suite.Equal(`{"id":1,"name":"John Doe","email":"john@doe.com"}`, string(body))
 }
 
+func (suite *UserControllerIntegrationSuite) Test_Get_User_By_Id_Bad_Request() {
+	suite.userService.On("GetUser").Return(GetUser())
+
+	request := httptest.NewRequest("GET", "/users/a", nil)
+	response, err := suite.app.Test(request)
+
+	suite.NotNil(response)
+	suite.NoError(err)
+	suite.Equal(http.StatusBadRequest, response.StatusCode)
+}
+
 func (suite *UserControllerIntegrationSuite) Test_Get_Users() {
 	suite.userService.On("GetUsers").Return(GetUsers())
 

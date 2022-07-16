@@ -36,7 +36,7 @@ func NewBadRequest(message string) error {
 	return err
 }
 
-func (userController UserController) GetUsers(*fiber.Ctx) ([]application.UserDto, error) {
+func (userController UserController) GetUsers() ([]application.UserDto, error) {
 	return userController.
 		userService.
 		GetUsers()
