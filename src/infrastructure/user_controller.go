@@ -1,9 +1,10 @@
 package infrastructure
 
 import (
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/users-api/src/application"
-	"log"
+	"net/http"
 )
 
 type IUserController interface {
@@ -19,17 +20,23 @@ func NewUserController(userService application.IUserService) *UserController {
 	return &UserController{userService: userService}
 }
 
-func (userController UserController) GetUser(ctx *fiber.Ctx) *application.UserDto {
+func (userController UserController) GetUser(ctx *fiber.Ctx) (*application.UserDto, error) {
 	userId, err := ctx.ParamsInt("id")
 	if err != nil {
-		log.Printf("bad request")
+		err = NewBadRequest(fmt.Sprintf("Invalid format for userId, %s", ctx.Params("id")))
+		return nil, err
 	}
 	return userController.
 		userService.
 		GetUser(userId)
 }
 
-func (userController UserController) GetUsers(*fiber.Ctx) []application.UserDto {
+func NewBadRequest(message string) error {
+	err := fiber.NewError(http.StatusBadRequest, message)
+	return err
+}
+
+func (userController UserController) GetUsers(*fiber.Ctx) ([]application.UserDto, error) {
 	return userController.
 		userService.
 		GetUsers()

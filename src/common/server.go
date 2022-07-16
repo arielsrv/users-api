@@ -74,11 +74,17 @@ func (builder *WebServerBuilder) EnableNewRelic() *WebServerBuilder {
 
 func (builder *WebServerBuilder) AddRoutes() *WebServerBuilder {
 	builder.app.Get("/users/:id", func(ctx *fiber.Ctx) error {
-		userDto := builder.controllers.userController.GetUser(ctx)
+		userDto, err := builder.controllers.userController.GetUser(ctx)
+		if e, ok := err.(*fiber.Error); ok {
+			return ctx.Status(e.Code).SendString(err.Error())
+		}
 		return ctx.JSON(userDto)
 	})
 	builder.app.Get("/users", func(ctx *fiber.Ctx) error {
-		usersDto := builder.controllers.userController.GetUsers(ctx)
+		usersDto, err := builder.controllers.userController.GetUsers(ctx)
+		if e, ok := err.(*fiber.Error); ok {
+			return ctx.Status(e.Code).SendString(err.Error())
+		}
 		return ctx.JSON(usersDto)
 	})
 	return builder

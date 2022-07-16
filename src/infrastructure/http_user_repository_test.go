@@ -39,9 +39,10 @@ func (mock *MockClient) Get(string) (response *http.Response, err error) {
 func (suite *HttpUserRepositoryUnitSuite) TestGet() {
 	suite.client.On("Get").Return(Get())
 
-	actual := suite.userRepository.GetUser(1)
+	actual, err := suite.userRepository.GetUser(1)
 
 	suite.NotNil(actual)
+	suite.NoError(err)
 	suite.Equal(1, actual.Id)
 	suite.Equal("John Doe", actual.Name)
 	suite.Equal("john@doe.com", actual.Email)
@@ -50,9 +51,10 @@ func (suite *HttpUserRepositoryUnitSuite) TestGet() {
 func (suite *HttpUserRepositoryUnitSuite) TestGetAll() {
 	suite.client.On("Get").Return(GetAll())
 
-	actual := suite.userRepository.GetUsers()
+	actual, err := suite.userRepository.GetUsers()
 
 	suite.NotNil(actual)
+	suite.NoError(err)
 	suite.Len(actual, 2)
 
 	suite.NotNil(actual[0])

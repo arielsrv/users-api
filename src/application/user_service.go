@@ -1,10 +1,12 @@
 package application
 
-import "github.com/users-api/src/domain"
+import (
+	"github.com/users-api/src/domain"
+)
 
 type IUserService interface {
-	GetUser(id int) *UserDto
-	GetUsers() []UserDto
+	GetUser(id int) (*UserDto, error)
+	GetUsers() ([]UserDto, error)
 }
 type UserService struct {
 	userRepository domain.UserRepository
@@ -14,14 +16,20 @@ func NewUserService(userRepository domain.UserRepository) *UserService {
 	return &UserService{userRepository: userRepository}
 }
 
-func (service UserService) GetUser(id int) *UserDto {
-	user := service.userRepository.GetUser(id)
+func (service UserService) GetUser(id int) (*UserDto, error) {
+	user, err := service.userRepository.GetUser(id)
+	if err != nil {
+		return nil, err
+	}
 	userDto := UserDto{Id: user.Id, Name: user.Name, Email: user.Email}
-	return &userDto
+	return &userDto, nil
 }
 
-func (service UserService) GetUsers() []UserDto {
-	users := service.userRepository.GetUsers()
+func (service UserService) GetUsers() ([]UserDto, error) {
+	users, err := service.userRepository.GetUsers()
+	if err != nil {
+		return nil, err
+	}
 	var usersDto = make([]UserDto, len(users))
 
 	for i, user := range users {
@@ -32,5 +40,5 @@ func (service UserService) GetUsers() []UserDto {
 		usersDto[i] = userDto
 	}
 
-	return usersDto
+	return usersDto, nil
 }

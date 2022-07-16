@@ -28,24 +28,25 @@ func (suite *UserServiceUnitTestSuite) SetupTest() {
 	suite.userService = application.NewUserService(suite.userRepository)
 }
 
-func (mock *MockUserRepository) GetUser(int) *domain.User {
+func (mock *MockUserRepository) GetUser(int) (*domain.User, error) {
 	args := mock.Called()
 	result := args.Get(0)
-	return result.(*domain.User)
+	return result.(*domain.User), nil
 }
 
-func (mock *MockUserRepository) GetUsers() []domain.User {
+func (mock *MockUserRepository) GetUsers() ([]domain.User, error) {
 	args := mock.Called()
 	result := args.Get(0)
-	return result.([]domain.User)
+	return result.([]domain.User), nil
 }
 
 func (suite *UserServiceUnitTestSuite) TestGetUser() {
 	suite.userRepository.On("GetUser").Return(GetUser())
 
-	actual := suite.userService.GetUser(1)
+	actual, err := suite.userService.GetUser(1)
 
 	suite.NotNil(actual)
+	suite.NoError(err)
 	suite.Equal(1, actual.Id)
 	suite.Equal("John Doe", actual.Name)
 	suite.Equal("john@doe.com", actual.Email)
@@ -54,9 +55,10 @@ func (suite *UserServiceUnitTestSuite) TestGetUser() {
 func (suite *UserServiceUnitTestSuite) TestGetUsers() {
 	suite.userRepository.On("GetUsers").Return(GetUsers())
 
-	actual := suite.userService.GetUsers()
+	actual, err := suite.userService.GetUsers()
 
 	suite.NotNil(actual)
+	suite.NoError(err)
 	suite.Len(actual, 2)
 	suite.NotNil(actual[0])
 	suite.Equal(1, actual[0].Id)

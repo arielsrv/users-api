@@ -37,16 +37,16 @@ func (suite *UserControllerIntegrationSuite) SetupTest() {
 		GetWebServer()
 }
 
-func (mock *MockUserService) GetUser(int) *application.UserDto {
+func (mock *MockUserService) GetUser(int) (*application.UserDto, error) {
 	args := mock.Called()
 	result := args.Get(0)
-	return result.(*application.UserDto)
+	return result.(*application.UserDto), nil
 }
 
-func (mock *MockUserService) GetUsers() []application.UserDto {
+func (mock *MockUserService) GetUsers() ([]application.UserDto, error) {
 	args := mock.Called()
 	result := args.Get(0)
-	return result.([]application.UserDto)
+	return result.([]application.UserDto), nil
 }
 
 func TestIntegration(t *testing.T) {
