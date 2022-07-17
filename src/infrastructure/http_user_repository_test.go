@@ -16,15 +16,12 @@ type HttpUserRepositoryUnitSuite struct {
 	suite.Suite
 	client              *MockClient
 	userRepository      *HttpUserRepository
-	errorClient         *MockErrorClient
 	userErrorRepository *HttpUserRepository
 }
 
 func (suite *HttpUserRepositoryUnitSuite) SetupTest() {
 	suite.client = new(MockClient)
-	suite.errorClient = new(MockErrorClient)
 	suite.userRepository = NewHttpUserRepository(suite.client)
-	suite.userErrorRepository = NewHttpUserRepository(suite.errorClient)
 }
 
 func TestUnit(t *testing.T) {
@@ -36,16 +33,6 @@ type MockClient struct {
 }
 
 func (mock *MockClient) Get(string) (response *Response, err error) {
-	args := mock.Called()
-	result := args.Get(0)
-	return result.(*Response), err
-}
-
-type MockErrorClient struct {
-	mock.Mock
-}
-
-func (mock *MockErrorClient) Get(string) (response *Response, err error) {
 	args := mock.Called()
 	result := args.Get(0)
 	return result.(*Response), err
@@ -77,7 +64,7 @@ func (suite *HttpUserRepositoryUnitSuite) TestGet_NotFound() {
 }
 
 func (suite *HttpUserRepositoryUnitSuite) TestGet_InternalServerError() {
-	suite.errorClient.On("Get").Return(&Response{})
+	suite.client.On("Get").Return(&Response{})
 
 	actual, err := suite.userErrorRepository.GetUser(1)
 
@@ -102,7 +89,7 @@ func (suite *HttpUserRepositoryUnitSuite) TestGetUsers_NotFound() {
 }
 
 func (suite *HttpUserRepositoryUnitSuite) TestGetUsers_InternalServerError() {
-	suite.errorClient.On("Get").Return(&Response{})
+	suite.client.On("Get").Return(&Response{})
 
 	actual, err := suite.userErrorRepository.GetUsers()
 
