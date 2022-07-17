@@ -27,7 +27,7 @@ type MockUserService struct {
 
 func (suite *UserControllerIntegrationSuite) SetupTest() {
 	suite.userService = new(MockUserService)
-	builder := common.NewWebServerBuilder()
+	builder := common.NewWebServerBuilder("false")
 	suite.app = builder.
 		AddControllers(common.NewControllers(
 			infrastructure.NewUserController(suite.userService),
