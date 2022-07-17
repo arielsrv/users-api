@@ -9,6 +9,7 @@ import (
 	"github.com/nobuyo/nrfiber"
 	"github.com/users-api/src/infrastructure"
 	"os"
+	"strconv"
 )
 
 type WebServer struct {
@@ -32,11 +33,15 @@ type WebServerBuilder struct {
 	controllers *Controllers
 }
 
-func NewWebServerBuilder() *WebServerBuilder {
+func NewWebServerBuilder(preforkEnvVar string) *WebServerBuilder {
+	prefork := false
+	if preforkEnvVar != "" {
+		prefork, _ = strconv.ParseBool(preforkEnvVar)
+	}
 	return &WebServerBuilder{
 		app: fiber.New(fiber.Config{
 			AppName:           "users-api",
-			Prefork:           false,
+			Prefork:           prefork,
 			EnablePrintRoutes: true,
 		}),
 	}

@@ -19,7 +19,8 @@ func main() {
 		GetUserController(),
 	)
 
-	builder := common.NewWebServerBuilder()
+	prefork := os.Getenv("PREFORK")
+	builder := common.NewWebServerBuilder(prefork)
 	_ = builder.
 		EnableRecover().
 		EnableNewRelic().
