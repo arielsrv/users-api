@@ -15,13 +15,16 @@ import (
 type HttpUserRepositoryUnitSuite struct {
 	suite.Suite
 	client              *MockClient
+	errorClient         *MockErrorClient
 	userRepository      *HttpUserRepository
 	userErrorRepository *HttpUserRepository
 }
 
 func (suite *HttpUserRepositoryUnitSuite) SetupTest() {
 	suite.client = new(MockClient)
+	suite.errorClient = new(MockErrorClient)
 	suite.userRepository = NewHttpUserRepository(suite.client)
+	suite.userErrorRepository = NewHttpUserRepository(suite.errorClient)
 }
 
 func TestUnit(t *testing.T) {
@@ -32,10 +35,18 @@ type MockClient struct {
 	mock.Mock
 }
 
+type MockErrorClient struct {
+	mock.Mock
+}
+
 func (mock *MockClient) Get(string) (response *Response, err error) {
 	args := mock.Called()
-	result := args.Get(0)
-	return result.(*Response), err
+	return args.Get(0).(*Response), err
+}
+
+func (mock *MockErrorClient) Get(string) (response *Response, err error) {
+	args := mock.Called()
+	return args.Get(0).(*Response), args.Get(1).(error)
 }
 
 func (suite *HttpUserRepositoryUnitSuite) TestGet() {
@@ -51,9 +62,9 @@ func (suite *HttpUserRepositoryUnitSuite) TestGet() {
 }
 
 func (suite *HttpUserRepositoryUnitSuite) TestGet_NotFound() {
-	suite.client.On("Get").Return(GetNotFound())
+	suite.errorClient.On("Get").Return(GetNotFound())
 
-	actual, err := suite.userRepository.GetUser(1)
+	actual, err := suite.userErrorRepository.GetUser(1)
 
 	suite.Nil(actual)
 	suite.Error(err)
@@ -64,7 +75,7 @@ func (suite *HttpUserRepositoryUnitSuite) TestGet_NotFound() {
 }
 
 func (suite *HttpUserRepositoryUnitSuite) TestGet_InternalServerError() {
-	suite.client.On("Get").Return(&Response{})
+	suite.errorClient.On("Get").Return(GetInternalServerError())
 
 	actual, err := suite.userErrorRepository.GetUser(1)
 
@@ -77,9 +88,9 @@ func (suite *HttpUserRepositoryUnitSuite) TestGet_InternalServerError() {
 }
 
 func (suite *HttpUserRepositoryUnitSuite) TestGetUsers_NotFound() {
-	suite.client.On("Get").Return(GetNotFound())
+	suite.errorClient.On("Get").Return(GetNotFound())
 
-	actual, err := suite.userRepository.GetUsers()
+	actual, err := suite.userErrorRepository.GetUsers()
 
 	suite.Nil(actual)
 	suite.Error(err)
@@ -89,7 +100,7 @@ func (suite *HttpUserRepositoryUnitSuite) TestGetUsers_NotFound() {
 }
 
 func (suite *HttpUserRepositoryUnitSuite) TestGetUsers_InternalServerError() {
-	suite.client.On("Get").Return(&Response{})
+	suite.errorClient.On("Get").Return(GetInternalServerError())
 
 	actual, err := suite.userErrorRepository.GetUsers()
 
@@ -143,7 +154,11 @@ func buildResponse(binary []byte) (*Response, error) {
 }
 
 func GetNotFound() (response *Response, err error) {
-	return nil, fiber.NewError(http.StatusNotFound, "not found")
+	return nil, fiber.NewError(http.StatusNotFound, "Couldn't retreive user with id 1 not found. ")
+}
+
+func GetInternalServerError() (response *Response, err error) {
+	return nil, fiber.NewError(http.StatusInternalServerError, "A error has ocurred. ")
 }
 
 func GetAll() (response *Response, err error) {
