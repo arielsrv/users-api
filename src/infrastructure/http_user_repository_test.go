@@ -3,7 +3,6 @@ package infrastructure
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
@@ -65,10 +64,7 @@ func (suite *HttpUserRepositoryUnitSuite) TestGet() {
 }
 
 func (suite *HttpUserRepositoryUnitSuite) TestGet_NotFound() {
-	suite.client.On("Get").Return(&Response{
-		Raw:  http.Response{},
-		Data: nil,
-	}, errors.New("asdasd"))
+	suite.client.On("Get").Return(GetNotFound())
 
 	actual, err := suite.userRepository.GetUser(1)
 
