@@ -3,7 +3,6 @@ package infrastructure
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
@@ -16,8 +15,8 @@ import (
 type HttpUserRepositoryUnitSuite struct {
 	suite.Suite
 	client              *MockClient
-	userRepository      *HttpUserRepository
 	errorClient         *MockErrorClient
+	userRepository      *HttpUserRepository
 	userErrorRepository *HttpUserRepository
 }
 
@@ -36,20 +35,18 @@ type MockClient struct {
 	mock.Mock
 }
 
-func (mock *MockClient) Get(string) (response *http.Response, err error) {
-	args := mock.Called()
-	result := args.Get(0)
-	return result.(*http.Response), nil
-}
-
 type MockErrorClient struct {
 	mock.Mock
 }
 
-func (mock *MockErrorClient) Get(string) (response *http.Response, err error) {
+func (mock *MockClient) Get(string) (response *Response, err error) {
 	args := mock.Called()
-	result := args.Get(0)
-	return result.(*http.Response), errors.New("A error has ocurred. ")
+	return args.Get(0).(*Response), err
+}
+
+func (mock *MockErrorClient) Get(string) (response *Response, err error) {
+	args := mock.Called()
+	return args.Get(0).(*Response), args.Get(1).(error)
 }
 
 func (suite *HttpUserRepositoryUnitSuite) TestGet() {
@@ -65,9 +62,9 @@ func (suite *HttpUserRepositoryUnitSuite) TestGet() {
 }
 
 func (suite *HttpUserRepositoryUnitSuite) TestGet_NotFound() {
-	suite.client.On("Get").Return(GetNotFound())
+	suite.errorClient.On("Get").Return(GetNotFound())
 
-	actual, err := suite.userRepository.GetUser(1)
+	actual, err := suite.userErrorRepository.GetUser(1)
 
 	suite.Nil(actual)
 	suite.Error(err)
@@ -78,7 +75,7 @@ func (suite *HttpUserRepositoryUnitSuite) TestGet_NotFound() {
 }
 
 func (suite *HttpUserRepositoryUnitSuite) TestGet_InternalServerError() {
-	suite.errorClient.On("Get").Return(&http.Response{})
+	suite.errorClient.On("Get").Return(GetInternalServerError())
 
 	actual, err := suite.userErrorRepository.GetUser(1)
 
@@ -91,9 +88,9 @@ func (suite *HttpUserRepositoryUnitSuite) TestGet_InternalServerError() {
 }
 
 func (suite *HttpUserRepositoryUnitSuite) TestGetUsers_NotFound() {
-	suite.client.On("Get").Return(GetNotFound())
+	suite.errorClient.On("Get").Return(GetNotFound())
 
-	actual, err := suite.userRepository.GetUsers()
+	actual, err := suite.userErrorRepository.GetUsers()
 
 	suite.Nil(actual)
 	suite.Error(err)
@@ -103,7 +100,7 @@ func (suite *HttpUserRepositoryUnitSuite) TestGetUsers_NotFound() {
 }
 
 func (suite *HttpUserRepositoryUnitSuite) TestGetUsers_InternalServerError() {
-	suite.errorClient.On("Get").Return(&http.Response{})
+	suite.errorClient.On("Get").Return(GetInternalServerError())
 
 	actual, err := suite.userErrorRepository.GetUsers()
 
@@ -135,7 +132,7 @@ func (suite *HttpUserRepositoryUnitSuite) TestGetAll() {
 	suite.Equal("john@foo.com", actual[1].Email)
 }
 
-func Get() (response *http.Response, err error) {
+func Get() (response *Response, err error) {
 	user := domain.User{
 		Id:    1,
 		Name:  "John Doe",
@@ -145,13 +142,26 @@ func Get() (response *http.Response, err error) {
 	return buildResponse(binary)
 }
 
-func GetNotFound() (response *http.Response, err error) {
-	return &http.Response{
-		StatusCode: http.StatusNotFound,
+func buildResponse(binary []byte) (*Response, error) {
+	var httpResponse = http.Response{
+		StatusCode: http.StatusOK,
+		Body:       ioutil.NopCloser(bytes.NewBuffer(binary)),
+	}
+	return &Response{
+		Raw:  httpResponse,
+		Data: binary,
 	}, nil
 }
 
-func GetAll() (response *http.Response, err error) {
+func GetNotFound() (response *Response, err error) {
+	return nil, fiber.NewError(http.StatusNotFound, "Couldn't retreive user with id 1 not found. ")
+}
+
+func GetInternalServerError() (response *Response, err error) {
+	return nil, fiber.NewError(http.StatusInternalServerError, "A error has ocurred. ")
+}
+
+func GetAll() (response *Response, err error) {
 	user1 := domain.User{
 		Id:    1,
 		Name:  "John Doe",
@@ -167,11 +177,4 @@ func GetAll() (response *http.Response, err error) {
 	users[1] = user2
 	binary, err := json.Marshal(users)
 	return buildResponse(binary)
-}
-
-func buildResponse(binary []byte) (*http.Response, error) {
-	return &http.Response{
-		StatusCode: http.StatusOK,
-		Body:       ioutil.NopCloser(bytes.NewBuffer(binary)),
-	}, nil
 }
