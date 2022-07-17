@@ -73,21 +73,29 @@ func (builder *WebServerBuilder) EnableNewRelic() *WebServerBuilder {
 }
 
 func (builder *WebServerBuilder) AddRoutes() *WebServerBuilder {
-	builder.app.Get("/users/:id", func(ctx *fiber.Ctx) error {
-		userDto, err := builder.controllers.userController.GetUser(ctx)
-		if e, ok := err.(*fiber.Error); ok {
-			return ctx.Status(e.Code).SendString(err.Error())
-		}
-		return ctx.JSON(userDto)
-	})
-	builder.app.Get("/users", func(ctx *fiber.Ctx) error {
+	builder.app.Get("/users/:id", builder.GetUserById())
+	builder.app.Get("/users", builder.GetUsers())
+	return builder
+}
+
+func (builder *WebServerBuilder) GetUsers() func(ctx *fiber.Ctx) error {
+	return func(ctx *fiber.Ctx) error {
 		usersDto, err := builder.controllers.userController.GetUsers()
 		if e, ok := err.(*fiber.Error); ok {
 			return ctx.Status(e.Code).SendString(err.Error())
 		}
 		return ctx.JSON(usersDto)
-	})
-	return builder
+	}
+}
+
+func (builder *WebServerBuilder) GetUserById() func(ctx *fiber.Ctx) error {
+	return func(ctx *fiber.Ctx) error {
+		userDto, err := builder.controllers.userController.GetUser(ctx)
+		if e, ok := err.(*fiber.Error); ok {
+			return ctx.Status(e.Code).SendString(err.Error())
+		}
+		return ctx.JSON(userDto)
+	}
 }
 
 func (builder *WebServerBuilder) AddControllers(controllers *Controllers) *WebServerBuilder {
