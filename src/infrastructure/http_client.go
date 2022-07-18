@@ -6,15 +6,19 @@ import (
 	"net/http"
 )
 
+type WrappedClient interface {
+	Get(url string) (response *http.Response, err error)
+}
+
 type HttpClient interface {
 	Get(url string) (response *Response, err error)
 }
 
 type CustomClient struct {
-	client http.Client
+	client WrappedClient
 }
 
-func NewCustomClient(client http.Client) *CustomClient {
+func NewCustomClient(client WrappedClient) *CustomClient {
 	return &CustomClient{client: client}
 }
 
