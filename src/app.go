@@ -33,8 +33,8 @@ func main() {
 }
 
 func GetUserController() *infrastructure.UserController {
-	customHttpClient := infrastructure.NewCustomClient(&http.Client{})
-	userRepository := infrastructure.NewHttpUserRepository(customHttpClient)
+	httpClientProxy := infrastructure.NewHttpClientProxy(http.Client{})
+	userRepository := infrastructure.NewHttpUserRepository(httpClientProxy)
 	userService := application.NewUserService(userRepository)
 	userController := infrastructure.NewUserController(userService)
 	return userController
