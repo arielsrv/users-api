@@ -18,17 +18,11 @@ func NewHttpUserRepository(client HttpClient) *HttpUserRepository {
 func (repository HttpUserRepository) GetUser(userId int) (*domain.User, error) {
 	url := "https://gorest.co.in/public/v2/users/" + strconv.Itoa(userId)
 	user, err := Client[domain.User]{client: repository.client}.Get(url)
-	if err != nil {
-		return &user, err
-	}
-	return &user, nil
+	return &user, err
 }
 
 func (repository HttpUserRepository) GetUsers() ([]domain.User, error) {
 	url := "https://gorest.co.in/public/v2/users/"
 	users, err := Client[[]domain.User]{client: repository.client}.Get(url)
-	if err != nil {
-		return users, err
-	}
-	return users, nil
+	return users, err
 }
