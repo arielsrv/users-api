@@ -42,7 +42,7 @@ func NewWebServerBuilder(preforkEnvVar string) *WebServerBuilder {
 		app: fiber.New(fiber.Config{
 			AppName:           "users-api",
 			Prefork:           prefork,
-			EnablePrintRoutes: true,
+			EnablePrintRoutes: false,
 		}),
 	}
 }
