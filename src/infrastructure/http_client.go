@@ -12,10 +12,10 @@ type HttpClient interface {
 }
 
 type HttpClientProxy struct {
-	client http.Client
+	client HttpClient
 }
 
-func NewHttpClientProxy(client http.Client) *HttpClientProxy {
+func NewHttpClientProxy(client HttpClient) *HttpClientProxy {
 	return &HttpClientProxy{client: client}
 }
 
@@ -42,14 +42,11 @@ func (httpClient Client[T]) Get(url string) (T, error) {
 		return reference, err
 	}
 
-	body, _ := io.ReadAll(response.Body)
+	body, err := io.ReadAll(response.Body)
 	defer func(Body io.ReadCloser) {
-		_ = Body.Close()
+		err = Body.Close()
 	}(response.Body)
 	err = json.Unmarshal(body, &reference)
-	if err != nil {
-		panic(err)
-	}
 
 	return reference, err
 }

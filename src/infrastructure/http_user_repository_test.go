@@ -60,6 +60,14 @@ func (suite *HttpUserRepositoryUnitSuite) TestGet() {
 	suite.Equal("john@doe.com", actual.Email)
 }
 
+func (suite *HttpUserRepositoryUnitSuite) TestError() {
+	suite.errorClient.On("Get").Return(GetError())
+
+	_, err := suite.userErrorRepository.GetUser(1)
+
+	suite.Error(err)
+}
+
 func Get() (*http.Response, error) {
 	user := domain.User{
 		Id:    1,
