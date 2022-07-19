@@ -22,9 +22,9 @@ type HttpClientUnitSuite struct {
 
 func (suite *HttpClientUnitSuite) SetupTest() {
 	suite.client = new(MockHttpClient)
-	suite.customClient = NewCustomClient(suite.client)
+	suite.customClient = NewCustomClient(suite.client, "users-client")
 	suite.errorClient = new(MockHttpErrorClient)
-	suite.customErrorClient = NewCustomClient(suite.errorClient)
+	suite.customErrorClient = NewCustomClient(suite.errorClient, "users-client")
 }
 
 func TestHttpClientUnit(t *testing.T) {
