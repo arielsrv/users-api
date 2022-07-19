@@ -60,12 +60,61 @@ func (suite *HttpUserRepositoryUnitSuite) TestGet() {
 	suite.Equal("john@doe.com", actual.Email)
 }
 
+func (suite *HttpUserRepositoryUnitSuite) TestGetUsers() {
+	suite.client.On("Get").Return(GetUsers())
+
+	actual, err := suite.userRepository.GetUsers()
+
+	suite.NotNil(actual)
+	suite.NoError(err)
+	suite.Len(actual, 2)
+	suite.NotNil(actual[0])
+	suite.Equal(1, actual[0].Id)
+	suite.Equal("John Doe", actual[0].Name)
+	suite.Equal("john@doe.com", actual[0].Email)
+	suite.NotNil(actual[1])
+	suite.Equal(2, actual[1].Id)
+	suite.Equal("John Foo", actual[1].Name)
+	suite.Equal("john@foo.com", actual[1].Email)
+}
+
+func GetUsers() (*http.Response, error) {
+	users := make([]domain.User, 2)
+	users[0] = domain.User{
+		Id:    1,
+		Name:  "John Doe",
+		Email: "john@doe.com",
+	}
+	users[1] = domain.User{
+		Id:    2,
+		Name:  "John Foo",
+		Email: "john@foo.com",
+	}
+	binary, _ := json.Marshal(users)
+	return &http.Response{
+		StatusCode: 200,
+		Body:       ioutil.NopCloser(bytes.NewBuffer(binary)),
+	}, nil
+}
+
 func (suite *HttpUserRepositoryUnitSuite) TestError() {
 	suite.errorClient.On("Get").Return(GetError())
 
 	_, err := suite.userErrorRepository.GetUser(1)
 
 	suite.Error(err)
+}
+
+func (suite *HttpUserRepositoryUnitSuite) TestNotOk() {
+	suite.client.On("Get").Return(GetNotFound())
+
+	_, err := suite.userRepository.GetUser(1)
+
+	suite.Error(err)
+}
+
+func GetNotFound() (*http.Response, error) {
+	return &http.Response{StatusCode: http.StatusNotFound}, nil
 }
 
 func Get() (*http.Response, error) {
