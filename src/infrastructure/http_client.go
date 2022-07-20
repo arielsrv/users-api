@@ -23,11 +23,11 @@ func (customHttpClient HttpClientProxy) Get(url string) (response *http.Response
 	return customHttpClient.client.Get(url)
 }
 
-type GenericClient[T any] struct {
+type Client[T any] struct {
 	client HttpClient
 }
 
-func (httpClient GenericClient[T]) Get(url string) (T, error) {
+func (httpClient Client[T]) Get(url string) (T, error) {
 	var reference T
 
 	response, err := httpClient.client.Get(url)
