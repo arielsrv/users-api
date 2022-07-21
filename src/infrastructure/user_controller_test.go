@@ -18,7 +18,6 @@ type UserControllerIntegrationSuite struct {
 	suite.Suite
 	app         *fiber.App
 	userService *MockUserService
-	port        string
 }
 
 type MockUserService struct {
