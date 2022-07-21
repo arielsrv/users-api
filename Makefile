@@ -8,6 +8,9 @@ build:
 test:
 	go test ./...
 
+lint:
+	$(shell golangci-lint run)
+
 coverage:
 	mkdir -p coverage
 	go test -v ./... -covermode=count -coverpkg=./... -coverprofile coverage/coverage.out

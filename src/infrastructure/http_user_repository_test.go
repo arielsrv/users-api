@@ -138,7 +138,7 @@ func Get() (response *Response, err error) {
 		Name:  "John Doe",
 		Email: "john@doe.com",
 	}
-	binary, err := json.Marshal(user)
+	binary, _ := json.Marshal(user)
 	return buildResponse(binary)
 }
 
@@ -175,6 +175,6 @@ func GetAll() (response *Response, err error) {
 	var users = make([]domain.User, 2)
 	users[0] = user1
 	users[1] = user2
-	binary, err := json.Marshal(users)
+	binary, _ := json.Marshal(users)
 	return buildResponse(binary)
 }
