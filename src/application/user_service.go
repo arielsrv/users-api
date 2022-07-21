@@ -30,15 +30,14 @@ func (service UserService) GetUsers() ([]UserDto, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	var usersDto = make([]UserDto, len(users))
-
 	for i, user := range users {
-		var userDto UserDto
-		userDto.ID = user.ID
-		userDto.Name = user.Name
-		userDto.Email = user.Email
-		usersDto[i] = userDto
+		usersDto[i] = UserDto{
+			ID:    user.ID,
+			Name:  user.Name,
+			Email: user.Email,
+		}
 	}
-
 	return usersDto, nil
 }
