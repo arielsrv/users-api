@@ -28,5 +28,6 @@ clean:
 all:
 	@make -s clean
 	@make -s build
+	@make -s lint
 	@make -s test
 	@make -s coverage
