@@ -1,30 +1,26 @@
 package infrastructure
 
 import (
-	"bytes"
-	"encoding/json"
 	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
-	"github.com/users-api/src/domain"
-	"io/ioutil"
 	"net/http"
 	"testing"
 )
 
 type HttpClientUnitSuite struct {
 	suite.Suite
-	client            *MockHttpClient
-	customClient      *CustomClient
-	errorClient       *MockHttpErrorClient
-	customErrorClient *CustomClient
+	client      *MockHttpClient
+	proxy       *HttpClientProxy
+	errorClient *MockHttpErrorClient
+	errorProxy  *HttpClientProxy
 }
 
 func (suite *HttpClientUnitSuite) SetupTest() {
 	suite.client = new(MockHttpClient)
-	suite.customClient = NewCustomClient(suite.client)
 	suite.errorClient = new(MockHttpErrorClient)
-	suite.customErrorClient = NewCustomClient(suite.errorClient)
+	suite.proxy = NewHttpClientProxy(suite.client)
+	suite.errorProxy = NewHttpClientProxy(suite.errorClient)
 }
 
 func TestHttpClientUnit(t *testing.T) {
@@ -50,48 +46,19 @@ func (mock *MockHttpErrorClient) Get(string) (response *http.Response, err error
 }
 
 func (suite *HttpClientUnitSuite) TestGet() {
-	suite.client.On("Get").Return(GetHttpResponse())
-	response, err := suite.customClient.Get("foo.com/users1")
-
-	suite.NotNil(response)
+	suite.client.On("Get").Return(Get())
+	actual, err := suite.proxy.Get("foo.com/users/1")
+	suite.NotNil(actual)
 	suite.NoError(err)
 }
 
-func (suite *HttpClientUnitSuite) TestGetGenericError() {
-	suite.errorClient.On("Get").Return(GenericErrorResponse())
-	_, err := suite.customErrorClient.Get("foo.com/users1")
-
-	suite.Error(err)
-}
-
 func (suite *HttpClientUnitSuite) TestGetError() {
-	suite.client.On("Get").Return(ErrorResponse())
-	_, err := suite.customClient.Get("foo.com/users1")
-
+	suite.errorClient.On("Get").Return(GetError())
+	actual, err := suite.errorProxy.Get("foo.com/users/1")
+	suite.Nil(actual)
 	suite.Error(err)
 }
 
-func GenericErrorResponse() (*http.Response, error) {
-	return nil, fiber.NewError(http.StatusInternalServerError, "")
-}
-
-func ErrorResponse() (*http.Response, error) {
-	return &http.Response{
-		StatusCode: http.StatusNotFound,
-		Body:       nil,
-	}, nil
-}
-
-func GetHttpResponse() (*http.Response, error) {
-	user := domain.User{
-		Id:    1,
-		Name:  "John Doe",
-		Email: "john@doe.com",
-	}
-	binary, err := json.Marshal(user)
-	var httpResponse = http.Response{
-		StatusCode: http.StatusOK,
-		Body:       ioutil.NopCloser(bytes.NewBuffer(binary)),
-	}
-	return &httpResponse, err
+func GetError() (*http.Response, error) {
+	return nil, fiber.NewError(http.StatusInternalServerError, "error has ocurred. ")
 }

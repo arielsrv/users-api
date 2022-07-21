@@ -1,39 +1,30 @@
 package infrastructure
 
 import (
-	"encoding/json"
+	"fmt"
 	"github.com/users-api/src/domain"
-	"strconv"
 )
 
 type HttpUserRepository struct {
-	client HttpClient
+	client  HttpClient
+	baseUrl string
 }
 
-func NewHttpUserRepository(httpClient HttpClient) *HttpUserRepository {
+func NewHttpUserRepository(client HttpClient) *HttpUserRepository {
 	return &HttpUserRepository{
-		client: httpClient,
+		client:  client,
+		baseUrl: "https://gorest.co.in/public/v2",
 	}
 }
 
 func (repository HttpUserRepository) GetUser(userId int) (*domain.User, error) {
-	url := "https://gorest.co.in/public/v2/users/" + strconv.Itoa(userId)
-	response, err := repository.client.Get(url)
-	if err != nil {
-		return nil, err
-	}
-	user := domain.User{}
-	_ = json.Unmarshal(response.Data, &user)
-	return &user, nil
+	url := fmt.Sprintf("%s/users/%d", repository.baseUrl, userId)
+	user, err := Client[domain.User]{repository.client}.Get(url)
+	return &user, err
 }
 
 func (repository HttpUserRepository) GetUsers() ([]domain.User, error) {
-	url := "https://gorest.co.in/public/v2/users/"
-	response, err := repository.client.Get(url)
-	if err != nil {
-		return nil, err
-	}
-	var users []domain.User
-	_ = json.Unmarshal(response.Data, &users)
-	return users, nil
+	url := fmt.Sprintf("%s/users", repository.baseUrl)
+	users, err := Client[[]domain.User]{repository.client}.Get(url)
+	return users, err
 }

@@ -1,7 +1,9 @@
 package application_test
 
 import (
+	"github.com/gofiber/fiber/v2"
 	"github.com/users-api/src/application"
+	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/mock"
@@ -11,11 +13,17 @@ import (
 
 type UserServiceUnitTestSuite struct {
 	suite.Suite
-	userRepository *MockUserRepository
-	userService    *application.UserService
+	userRepository      *MockUserRepository
+	userService         *application.UserService
+	userErrorRepository *MockUserErrorRepository
+	userErrorService    *application.UserService
 }
 
 type MockUserRepository struct {
+	mock.Mock
+}
+
+type MockUserErrorRepository struct {
 	mock.Mock
 }
 
@@ -25,7 +33,9 @@ func TestUnit(t *testing.T) {
 
 func (suite *UserServiceUnitTestSuite) SetupTest() {
 	suite.userRepository = new(MockUserRepository)
+	suite.userErrorRepository = new(MockUserErrorRepository)
 	suite.userService = application.NewUserService(suite.userRepository)
+	suite.userErrorService = application.NewUserService(suite.userErrorRepository)
 }
 
 func (mock *MockUserRepository) GetUser(int) (*domain.User, error) {
@@ -40,6 +50,16 @@ func (mock *MockUserRepository) GetUsers() ([]domain.User, error) {
 	return result.([]domain.User), nil
 }
 
+func (mock *MockUserErrorRepository) GetUser(int) (*domain.User, error) {
+	args := mock.Called()
+	return args.Get(0).(*domain.User), args.Get(1).(error)
+}
+
+func (mock *MockUserErrorRepository) GetUsers() ([]domain.User, error) {
+	args := mock.Called()
+	return args.Get(0).([]domain.User), args.Get(1).(error)
+}
+
 func (suite *UserServiceUnitTestSuite) TestGetUser() {
 	suite.userRepository.On("GetUser").Return(GetUser())
 
@@ -50,6 +70,32 @@ func (suite *UserServiceUnitTestSuite) TestGetUser() {
 	suite.Equal(1, actual.Id)
 	suite.Equal("John Doe", actual.Name)
 	suite.Equal("john@doe.com", actual.Email)
+}
+
+func (suite *UserServiceUnitTestSuite) TestGetError() {
+	suite.userErrorRepository.On("GetUser").Return(GetUserError())
+
+	actual, err := suite.userErrorService.GetUser(1)
+
+	suite.Nil(actual)
+	suite.Error(err)
+}
+
+func (suite *UserServiceUnitTestSuite) TestGetUsersError() {
+	suite.userErrorRepository.On("GetUsers").Return(GetUsersError())
+
+	actual, err := suite.userErrorService.GetUsers()
+
+	suite.Nil(actual)
+	suite.Error(err)
+}
+
+func GetUserError() (*domain.User, error) {
+	return nil, fiber.NewError(http.StatusInternalServerError, "error has ocurred")
+}
+
+func GetUsersError() ([]domain.User, error) {
+	return nil, fiber.NewError(http.StatusInternalServerError, "error has ocurred")
 }
 
 func (suite *UserServiceUnitTestSuite) TestGetUsers() {

@@ -1,52 +1,52 @@
 package infrastructure
 
 import (
+	"encoding/json"
 	"github.com/gofiber/fiber/v2"
 	"io"
 	"net/http"
 )
 
-type WrappedClient interface {
+type HttpClient interface {
 	Get(url string) (response *http.Response, err error)
 }
 
-type HttpClient interface {
-	Get(url string) (response *Response, err error)
+type HttpClientProxy struct {
+	client HttpClient
 }
 
-type CustomClient struct {
-	client WrappedClient
+func NewHttpClientProxy(client HttpClient) *HttpClientProxy {
+	return &HttpClientProxy{client: client}
 }
 
-func NewCustomClient(client WrappedClient) *CustomClient {
-	return &CustomClient{client: client}
+func (customHttpClient HttpClientProxy) Get(url string) (response *http.Response, err error) {
+	return customHttpClient.client.Get(url)
 }
 
-type Response struct {
-	Raw  http.Response
-	Data []byte
+type Client[T any] struct {
+	client HttpClient
 }
 
-func (c CustomClient) Get(url string) (r *Response, err error) {
-	response, err := c.client.Get(url)
+func (httpClient Client[T]) Get(url string) (T, error) {
+	var reference T
+
+	response, err := httpClient.client.Get(url)
 
 	if err != nil {
 		err = fiber.NewError(http.StatusInternalServerError, err.Error())
-		return nil, err
+		return reference, err
 	}
 
 	if response.StatusCode != http.StatusOK {
 		err = fiber.NewError(response.StatusCode, "Couldn't retreive. ")
-		return nil, err
+		return reference, err
 	}
 
-	body, _ := io.ReadAll(response.Body)
+	body, err := io.ReadAll(response.Body)
 	defer func(Body io.ReadCloser) {
-		_ = Body.Close()
+		err = Body.Close()
 	}(response.Body)
+	err = json.Unmarshal(body, &reference)
 
-	return &Response{
-		Raw:  *response,
-		Data: body,
-	}, err
+	return reference, err
 }
