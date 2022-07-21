@@ -5,26 +5,26 @@ import (
 	"github.com/users-api/src/domain"
 )
 
-type HttpUserRepository struct {
-	client  HttpClient
-	baseUrl string
+type HTTPUserRepository struct {
+	client  HTTPClient
+	baseURL string
 }
 
-func NewHttpUserRepository(client HttpClient) *HttpUserRepository {
-	return &HttpUserRepository{
+func NewHTTPUserRepository(client HTTPClient) *HTTPUserRepository {
+	return &HTTPUserRepository{
 		client:  client,
-		baseUrl: "https://gorest.co.in/public/v2",
+		baseURL: "https://gorest.co.in/public/v2",
 	}
 }
 
-func (repository HttpUserRepository) GetUser(userId int) (*domain.User, error) {
-	url := fmt.Sprintf("%s/users/%d", repository.baseUrl, userId)
+func (repository HTTPUserRepository) GetUser(userID int) (*domain.User, error) {
+	url := fmt.Sprintf("%s/users/%d", repository.baseURL, userID)
 	user, err := Client[domain.User]{repository.client}.Get(url)
 	return &user, err
 }
 
-func (repository HttpUserRepository) GetUsers() ([]domain.User, error) {
-	url := fmt.Sprintf("%s/users", repository.baseUrl)
+func (repository HTTPUserRepository) GetUsers() ([]domain.User, error) {
+	url := fmt.Sprintf("%s/users", repository.baseURL)
 	users, err := Client[[]domain.User]{repository.client}.Get(url)
 	return users, err
 }

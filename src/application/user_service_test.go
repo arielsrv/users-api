@@ -67,7 +67,7 @@ func (suite *UserServiceUnitTestSuite) TestGetUser() {
 
 	suite.NotNil(actual)
 	suite.NoError(err)
-	suite.Equal(1, actual.Id)
+	suite.Equal(1, actual.ID)
 	suite.Equal("John Doe", actual.Name)
 	suite.Equal("john@doe.com", actual.Email)
 }
@@ -107,11 +107,11 @@ func (suite *UserServiceUnitTestSuite) TestGetUsers() {
 	suite.NoError(err)
 	suite.Len(actual, 2)
 	suite.NotNil(actual[0])
-	suite.Equal(1, actual[0].Id)
+	suite.Equal(1, actual[0].ID)
 	suite.Equal("John Doe", actual[0].Name)
 	suite.Equal("john@doe.com", actual[0].Email)
 	suite.NotNil(actual[1])
-	suite.Equal(2, actual[1].Id)
+	suite.Equal(2, actual[1].ID)
 	suite.Equal("John Foo", actual[1].Name)
 	suite.Equal("john@foo.com", actual[1].Email)
 }
@@ -119,12 +119,12 @@ func (suite *UserServiceUnitTestSuite) TestGetUsers() {
 func GetUsers() []domain.User {
 	users := make([]domain.User, 2)
 	users[0] = domain.User{
-		Id:    1,
+		ID:    1,
 		Name:  "John Doe",
 		Email: "john@doe.com",
 	}
 	users[1] = domain.User{
-		Id:    2,
+		ID:    2,
 		Name:  "John Foo",
 		Email: "john@foo.com",
 	}
@@ -133,7 +133,7 @@ func GetUsers() []domain.User {
 
 func GetUser() *domain.User {
 	return &domain.User{
-		Id:    1,
+		ID:    1,
 		Name:  "John Doe",
 		Email: "john@doe.com",
 	}

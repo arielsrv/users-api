@@ -9,7 +9,6 @@ import (
 )
 
 func main() {
-
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "3000"
@@ -33,8 +32,8 @@ func main() {
 }
 
 func GetUserController() *infrastructure.UserController {
-	httpClientProxy := infrastructure.NewHttpClientProxy(&http.Client{})
-	userRepository := infrastructure.NewHttpUserRepository(httpClientProxy)
+	httpClientProxy := infrastructure.NewHTTPClientProxy(&http.Client{})
+	userRepository := infrastructure.NewHTTPUserRepository(httpClientProxy)
 	userService := application.NewUserService(userRepository)
 	userController := infrastructure.NewUserController(userService)
 	return userController

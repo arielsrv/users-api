@@ -21,7 +21,7 @@ func (service UserService) GetUser(id int) (*UserDto, error) {
 	if err != nil {
 		return nil, err
 	}
-	userDto := UserDto{Id: user.Id, Name: user.Name, Email: user.Email}
+	userDto := UserDto{ID: user.ID, Name: user.Name, Email: user.Email}
 	return &userDto, err
 }
 
@@ -34,7 +34,7 @@ func (service UserService) GetUsers() ([]UserDto, error) {
 
 	for i, user := range users {
 		var userDto UserDto
-		userDto.Id = user.Id
+		userDto.ID = user.ID
 		userDto.Name = user.Name
 		userDto.Email = user.Email
 		usersDto[i] = userDto

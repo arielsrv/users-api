@@ -21,14 +21,14 @@ func NewUserController(userService application.IUserService) *UserController {
 }
 
 func (userController UserController) GetUser(ctx *fiber.Ctx) (*application.UserDto, error) {
-	userId, err := ctx.ParamsInt("id")
+	userID, err := ctx.ParamsInt("id")
 	if err != nil {
 		err = NewBadRequest(fmt.Sprintf("Invalid format for userId, %s", ctx.Params("id")))
 		return nil, err
 	}
 	return userController.
 		userService.
-		GetUser(userId)
+		GetUser(userID)
 }
 
 func NewBadRequest(message string) error {

@@ -7,24 +7,24 @@ import (
 	"net/http"
 )
 
-type HttpClient interface {
+type HTTPClient interface {
 	Get(url string) (response *http.Response, err error)
 }
 
-type HttpClientProxy struct {
-	client HttpClient
+type HTTPClientProxy struct {
+	client HTTPClient
 }
 
-func NewHttpClientProxy(client HttpClient) *HttpClientProxy {
-	return &HttpClientProxy{client: client}
+func NewHTTPClientProxy(client HTTPClient) *HTTPClientProxy {
+	return &HTTPClientProxy{client: client}
 }
 
-func (customHttpClient HttpClientProxy) Get(url string) (response *http.Response, err error) {
+func (customHttpClient HTTPClientProxy) Get(url string) (response *http.Response, err error) {
 	return customHttpClient.client.Get(url)
 }
 
 type Client[T any] struct {
-	client HttpClient
+	client HTTPClient
 }
 
 func (httpClient Client[T]) Get(url string) (T, error) {

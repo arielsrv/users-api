@@ -92,12 +92,12 @@ func (suite *UserControllerIntegrationSuite) Test_Get_Users() {
 func GetUsers() []application.UserDto {
 	usersDto := make([]application.UserDto, 2)
 	usersDto[0] = application.UserDto{
-		Id:    1,
+		ID:    1,
 		Name:  "John Doe",
 		Email: "john@doe.com",
 	}
 	usersDto[1] = application.UserDto{
-		Id:    2,
+		ID:    2,
 		Name:  "John Foo",
 		Email: "john@foo.com",
 	}
@@ -106,7 +106,7 @@ func GetUsers() []application.UserDto {
 
 func GetUser() *application.UserDto {
 	return &application.UserDto{
-		Id:    1,
+		ID:    1,
 		Name:  "John Doe",
 		Email: "john@doe.com",
 	}

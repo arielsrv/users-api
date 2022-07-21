@@ -11,23 +11,23 @@ import (
 	"testing"
 )
 
-type HttpUserRepositoryUnitSuite struct {
+type HTTPUserRepositoryUnitSuite struct {
 	suite.Suite
 	client              *MockClient
 	errorClient         *MockErrorClient
-	userRepository      *HttpUserRepository
-	userErrorRepository *HttpUserRepository
+	userRepository      *HTTPUserRepository
+	userErrorRepository *HTTPUserRepository
 }
 
-func (suite *HttpUserRepositoryUnitSuite) SetupTest() {
+func (suite *HTTPUserRepositoryUnitSuite) SetupTest() {
 	suite.client = new(MockClient)
 	suite.errorClient = new(MockErrorClient)
-	suite.userRepository = NewHttpUserRepository(suite.client)
-	suite.userErrorRepository = NewHttpUserRepository(suite.errorClient)
+	suite.userRepository = NewHTTPUserRepository(suite.client)
+	suite.userErrorRepository = NewHTTPUserRepository(suite.errorClient)
 }
 
 func TestUnit(t *testing.T) {
-	suite.Run(t, new(HttpUserRepositoryUnitSuite))
+	suite.Run(t, new(HTTPUserRepositoryUnitSuite))
 }
 
 type MockClient struct {
@@ -48,19 +48,19 @@ func (mock *MockErrorClient) Get(string) (response *http.Response, err error) {
 	return args.Get(0).(*http.Response), args.Get(1).(error)
 }
 
-func (suite *HttpUserRepositoryUnitSuite) TestGet() {
+func (suite *HTTPUserRepositoryUnitSuite) TestGet() {
 	suite.client.On("Get").Return(Get())
 
 	actual, err := suite.userRepository.GetUser(1)
 
 	suite.NotNil(actual)
 	suite.NoError(err)
-	suite.Equal(1, actual.Id)
+	suite.Equal(1, actual.ID)
 	suite.Equal("John Doe", actual.Name)
 	suite.Equal("john@doe.com", actual.Email)
 }
 
-func (suite *HttpUserRepositoryUnitSuite) TestGetUsers() {
+func (suite *HTTPUserRepositoryUnitSuite) TestGetUsers() {
 	suite.client.On("Get").Return(GetUsers())
 
 	actual, err := suite.userRepository.GetUsers()
@@ -69,11 +69,11 @@ func (suite *HttpUserRepositoryUnitSuite) TestGetUsers() {
 	suite.NoError(err)
 	suite.Len(actual, 2)
 	suite.NotNil(actual[0])
-	suite.Equal(1, actual[0].Id)
+	suite.Equal(1, actual[0].ID)
 	suite.Equal("John Doe", actual[0].Name)
 	suite.Equal("john@doe.com", actual[0].Email)
 	suite.NotNil(actual[1])
-	suite.Equal(2, actual[1].Id)
+	suite.Equal(2, actual[1].ID)
 	suite.Equal("John Foo", actual[1].Name)
 	suite.Equal("john@foo.com", actual[1].Email)
 }
@@ -81,12 +81,12 @@ func (suite *HttpUserRepositoryUnitSuite) TestGetUsers() {
 func GetUsers() (*http.Response, error) {
 	users := make([]domain.User, 2)
 	users[0] = domain.User{
-		Id:    1,
+		ID:    1,
 		Name:  "John Doe",
 		Email: "john@doe.com",
 	}
 	users[1] = domain.User{
-		Id:    2,
+		ID:    2,
 		Name:  "John Foo",
 		Email: "john@foo.com",
 	}
@@ -97,7 +97,7 @@ func GetUsers() (*http.Response, error) {
 	}, nil
 }
 
-func (suite *HttpUserRepositoryUnitSuite) TestError() {
+func (suite *HTTPUserRepositoryUnitSuite) TestError() {
 	suite.errorClient.On("Get").Return(GetError())
 
 	_, err := suite.userErrorRepository.GetUser(1)
@@ -105,7 +105,7 @@ func (suite *HttpUserRepositoryUnitSuite) TestError() {
 	suite.Error(err)
 }
 
-func (suite *HttpUserRepositoryUnitSuite) TestNotOk() {
+func (suite *HTTPUserRepositoryUnitSuite) TestNotOk() {
 	suite.client.On("Get").Return(GetNotFound())
 
 	_, err := suite.userRepository.GetUser(1)
@@ -119,7 +119,7 @@ func GetNotFound() (*http.Response, error) {
 
 func Get() (*http.Response, error) {
 	user := domain.User{
-		Id:    1,
+		ID:    1,
 		Name:  "John Doe",
 		Email: "john@doe.com",
 	}

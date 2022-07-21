@@ -1,6 +1,7 @@
 package common
 
 import (
+	"errors"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
@@ -78,7 +79,7 @@ func (builder *WebServerBuilder) EnableNewRelic() *WebServerBuilder {
 }
 
 func (builder *WebServerBuilder) AddRoutes() *WebServerBuilder {
-	builder.app.Get("/users/:id", builder.GetUserById())
+	builder.app.Get("/users/:id", builder.GetUserByID())
 	builder.app.Get("/users", builder.GetUsers())
 	return builder
 }
@@ -86,17 +87,18 @@ func (builder *WebServerBuilder) AddRoutes() *WebServerBuilder {
 func (builder *WebServerBuilder) GetUsers() func(ctx *fiber.Ctx) error {
 	return func(ctx *fiber.Ctx) error {
 		usersDto, err := builder.controllers.userController.GetUsers()
-		if e, ok := err.(*fiber.Error); ok {
+		var e *fiber.Error
+		if ok := errors.Is(err, e); ok {
 			return ctx.Status(e.Code).SendString(err.Error())
 		}
 		return ctx.JSON(usersDto)
 	}
 }
 
-func (builder *WebServerBuilder) GetUserById() func(ctx *fiber.Ctx) error {
+func (builder *WebServerBuilder) GetUserByID() func(ctx *fiber.Ctx) error {
 	return func(ctx *fiber.Ctx) error {
 		userDto, err := builder.controllers.userController.GetUser(ctx)
-		if e, ok := err.(*fiber.Error); ok {
+		if e, ok := err.(*fiber.Error); ok { //nolint:errorlint
 			return ctx.Status(e.Code).SendString(err.Error())
 		}
 		return ctx.JSON(userDto)
