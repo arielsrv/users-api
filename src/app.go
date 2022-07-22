@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/users-api/src/application"
 	"github.com/users-api/src/common"
 	"github.com/users-api/src/infrastructure"
@@ -27,7 +28,7 @@ func main() {
 
 	address, port := os.LookupEnv("PORT")
 	if port {
-		builder.Listen(address)
+		builder.Listen(fmt.Sprintf(":%s", address))
 	} else {
 		builder.Listen(":3000")
 	}

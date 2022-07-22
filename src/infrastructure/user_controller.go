@@ -27,7 +27,7 @@ func (userController UserController) GetUser(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	var result, _ = userController.
+	result, _ := userController.
 		userService.
 		GetUser(userID)
 
