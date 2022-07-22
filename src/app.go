@@ -15,11 +15,14 @@ func main() {
 	userService := application.NewUserService(userRepository)
 	userController := infrastructure.NewUserController(userService)
 
+	pingController := infrastructure.PingController{}
+
 	builder := common.NewWebServerBuilder()
 
 	builder.
 		AddRoute("GET", "/users/:id", userController.GetUser).
-		AddRoute("GET", "/users", userController.GetUsers)
+		AddRoute("GET", "/users", userController.GetUsers).
+		AddRoute("GET", "/ping", pingController.Ping)
 
 	builder.
 		EnableLog().
