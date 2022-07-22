@@ -7,7 +7,6 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"github.com/newrelic/go-agent/v3/newrelic"
 	"github.com/nobuyo/nrfiber"
-	"github.com/users-api/src/infrastructure"
 	"os"
 )
 
@@ -20,20 +19,11 @@ func (server *WebServer) App() *fiber.App {
 	return server.app
 }
 
-type Controllers struct {
-	userController *infrastructure.UserController
-}
-
-func NewControllers(userController *infrastructure.UserController) *Controllers {
-	return &Controllers{userController: userController}
-}
-
 func (server *WebServer) Start() {
-	server.app.Listen(server.addr)
+	_ = server.app.Listen(server.addr)
 }
 
 type WebServerBuilder struct {
-	app            *fiber.App
 	routes         []Route
 	enableLog      bool
 	enableNewRelic bool
