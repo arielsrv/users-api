@@ -15,7 +15,7 @@ func main() {
 	userService := application.NewUserService(userRepository)
 	userController := infrastructure.NewUserController(userService)
 
-	pingController := infrastructure.PingController{}
+	pingController := infrastructure.NewPingController()
 
 	builder := common.NewWebServerBuilder()
 
