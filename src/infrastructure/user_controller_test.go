@@ -26,14 +26,12 @@ type MockUserService struct {
 
 func (suite *UserControllerIntegrationSuite) SetupTest() {
 	suite.userService = new(MockUserService)
-	builder := common.NewWebServerBuilder("false")
+	builder := common.NewWebServerBuilder()
+	userController := infrastructure.NewUserController(suite.userService)
 	suite.app = builder.
-		AddControllers(common.NewControllers(
-			infrastructure.NewUserController(suite.userService),
-		)).
-		AddRoutes().
-		Build().
-		GetWebServer()
+		AddRoute("GET", "/users/:id", userController.GetUser).
+		AddRoute("GET", "/users", userController.GetUsers).
+		Build().App()
 }
 
 func (mock *MockUserService) GetUser(int) (*application.UserDto, error) {

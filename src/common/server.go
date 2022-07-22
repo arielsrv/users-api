@@ -1,7 +1,6 @@
 package common
 
 import (
-	"errors"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
@@ -10,11 +9,15 @@ import (
 	"github.com/nobuyo/nrfiber"
 	"github.com/users-api/src/infrastructure"
 	"os"
-	"strconv"
 )
 
 type WebServer struct {
-	app *fiber.App
+	app  *fiber.App
+	addr string
+}
+
+func (server *WebServer) App() *fiber.App {
+	return server.app
 }
 
 type Controllers struct {
@@ -25,93 +28,104 @@ func NewControllers(userController *infrastructure.UserController) *Controllers 
 	return &Controllers{userController: userController}
 }
 
-func (server *WebServer) GetWebServer() *fiber.App {
-	return server.app
+func (server *WebServer) Start() {
+	server.app.Listen(server.addr)
 }
 
 type WebServerBuilder struct {
-	app         *fiber.App
-	controllers *Controllers
+	app            *fiber.App
+	routes         []Route
+	enableLog      bool
+	enableNewRelic bool
+	enableRecover  bool
+	addr           string
+	prefork        bool
 }
 
-func NewWebServerBuilder(preforkEnvVar string) *WebServerBuilder {
-	prefork := false
-	if preforkEnvVar != "" {
-		prefork, _ = strconv.ParseBool(preforkEnvVar)
-	}
+func NewWebServerBuilder() *WebServerBuilder {
 	return &WebServerBuilder{
-		app: fiber.New(fiber.Config{
-			AppName:           "users-api",
-			Prefork:           prefork,
-			EnablePrintRoutes: false,
-		}),
+		routes: make([]Route, 0),
 	}
 }
 
 func (builder *WebServerBuilder) EnableRecover() *WebServerBuilder {
-	var config = recover.Config{
-		EnableStackTrace: true,
-	}
-	builder.app.Use(recover.New(config))
+	builder.enableRecover = true
 	return builder
 }
 
 func (builder *WebServerBuilder) EnableLog() *WebServerBuilder {
-	builder.app.Use(requestid.New())
-	builder.app.Use(logger.New(logger.Config{
-		Format: "${pid} ${locals:requestid} ${status} - ${method} ${path}\n",
-	}))
+	builder.enableLog = true
 	return builder
 }
 
 func (builder *WebServerBuilder) EnableNewRelic() *WebServerBuilder {
-	nrapp, _ := newrelic.NewApplication(
-		newrelic.ConfigAppName("golang-users-api"),
-		newrelic.ConfigLicense(os.Getenv("NEW_RELIC_LICENSE_KEY")),
-		newrelic.ConfigDebugLogger(os.Stdout),
-	)
-
-	builder.app.Use(nrfiber.New(nrfiber.Config{
-		NewRelicApp: nrapp,
-	}))
-
+	builder.enableNewRelic = true
 	return builder
 }
 
-func (builder *WebServerBuilder) AddRoutes() *WebServerBuilder {
-	builder.app.Get("/users/:id", builder.GetUserByID())
-	builder.app.Get("/users", builder.GetUsers())
+type Route struct {
+	Method string
+	Path   string
+	Action func(ctx *fiber.Ctx) error
+}
+
+func (builder *WebServerBuilder) AddRoute(method string, path string, action func(ctx *fiber.Ctx) error) *WebServerBuilder {
+	builder.routes = append(builder.routes, Route{
+		Method: method,
+		Path:   path,
+		Action: action,
+	})
 	return builder
 }
 
-func (builder *WebServerBuilder) GetUsers() func(ctx *fiber.Ctx) error {
-	return func(ctx *fiber.Ctx) error {
-		usersDto, err := builder.controllers.userController.GetUsers()
-		var e *fiber.Error
-		if ok := errors.Is(err, e); ok {
-			return ctx.Status(e.Code).SendString(err.Error())
-		}
-		return ctx.JSON(usersDto)
-	}
+func (builder *WebServerBuilder) Listen(address string) *WebServerBuilder {
+	builder.addr = address
+	return builder
 }
 
-func (builder *WebServerBuilder) GetUserByID() func(ctx *fiber.Ctx) error {
-	return func(ctx *fiber.Ctx) error {
-		userDto, err := builder.controllers.userController.GetUser(ctx)
-		if e, ok := err.(*fiber.Error); ok { //nolint:errorlint
-			return ctx.Status(e.Code).SendString(err.Error())
-		}
-		return ctx.JSON(userDto)
-	}
-}
-
-func (builder *WebServerBuilder) AddControllers(controllers *Controllers) *WebServerBuilder {
-	builder.controllers = controllers
+func (builder *WebServerBuilder) Prefork() *WebServerBuilder {
+	builder.prefork = true
 	return builder
 }
 
 func (builder *WebServerBuilder) Build() *WebServer {
+	app := fiber.New(fiber.Config{
+		AppName:           "users-api",
+		Prefork:           builder.prefork,
+		EnablePrintRoutes: false,
+	})
+
+	if builder.enableLog {
+		app.Use(requestid.New())
+		app.Use(logger.New(logger.Config{
+			Format: "${pid} ${locals:requestid} ${status} - ${method} ${path}\n",
+		}))
+	}
+
+	if builder.enableNewRelic {
+		nrapp, _ := newrelic.NewApplication(
+			newrelic.ConfigAppName("golang-users-api"),
+			newrelic.ConfigLicense(os.Getenv("NEW_RELIC_LICENSE_KEY")),
+			newrelic.ConfigDebugLogger(os.Stdout),
+		)
+
+		app.Use(nrfiber.New(nrfiber.Config{
+			NewRelicApp: nrapp,
+		}))
+	}
+
+	if builder.enableRecover {
+		app.Use(recover.New(recover.Config{
+			EnableStackTrace: true,
+		}))
+	}
+
+	for _, route := range builder.routes {
+		app.Add(route.Method, route.Path, route.Action)
+	}
+
 	return &WebServer{
-		app: builder.app,
+		app:  app,
+		addr: builder.addr,
 	}
 }

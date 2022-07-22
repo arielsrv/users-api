@@ -8,8 +8,8 @@ import (
 )
 
 type IUserController interface {
-	GetUser(ctx *fiber.Ctx) *application.UserDto
-	GetUsers(ctx *fiber.Ctx) []application.UserDto
+	GetUser(ctx *fiber.Ctx) error
+	GetUsers(ctx *fiber.Ctx) error
 }
 
 type UserController struct {
@@ -20,15 +20,18 @@ func NewUserController(userService application.IUserService) *UserController {
 	return &UserController{userService: userService}
 }
 
-func (userController UserController) GetUser(ctx *fiber.Ctx) (*application.UserDto, error) {
+func (userController UserController) GetUser(ctx *fiber.Ctx) error {
 	userID, err := ctx.ParamsInt("id")
 	if err != nil {
-		err = NewBadRequest(fmt.Sprintf("Invalid format for userId, %s", ctx.Params("id")))
-		return nil, err
+		err := NewBadRequest(fmt.Sprintf("Invalid format for userId, %s", ctx.Params("id")))
+		return err
 	}
-	return userController.
+
+	var result, _ = userController.
 		userService.
 		GetUser(userID)
+
+	return ctx.JSON(result)
 }
 
 func NewBadRequest(message string) error {
@@ -36,8 +39,14 @@ func NewBadRequest(message string) error {
 	return err
 }
 
-func (userController UserController) GetUsers() ([]application.UserDto, error) {
-	return userController.
+func (userController UserController) GetUsers(ctx *fiber.Ctx) error {
+	result, err := userController.
 		userService.
 		GetUsers()
+
+	if err != nil {
+		return err
+	}
+
+	return ctx.JSON(result)
 }

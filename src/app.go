@@ -9,32 +9,35 @@ import (
 )
 
 func main() {
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "3000"
-	}
-
-	controllers := common.NewControllers(
-		GetUserController(),
-	)
-
-	prefork := os.Getenv("PREFORK")
-	builder := common.NewWebServerBuilder(prefork)
-	_ = builder.
-		EnableRecover().
-		EnableNewRelic().
-		EnableLog().
-		AddControllers(controllers).
-		AddRoutes().
-		Build().
-		GetWebServer().
-		Listen(":" + port)
-}
-
-func GetUserController() *infrastructure.UserController {
 	httpClientProxy := infrastructure.NewHTTPClientProxy(&http.Client{})
 	userRepository := infrastructure.NewHTTPUserRepository(httpClientProxy)
 	userService := application.NewUserService(userRepository)
 	userController := infrastructure.NewUserController(userService)
-	return userController
+
+	builder := common.NewWebServerBuilder()
+
+	builder.
+		AddRoute("GET", "/users/:id", userController.GetUser).
+		AddRoute("GET", "/users", userController.GetUsers)
+
+	builder.
+		EnableLog().
+		EnableRecover().
+		EnableNewRelic()
+
+	address, port := os.LookupEnv("PORT")
+	if port {
+		builder.Listen(address)
+	} else {
+		builder.Listen(":3000")
+	}
+
+	_, prefork := os.LookupEnv("PREFORK")
+	if prefork {
+		builder.Prefork()
+	}
+
+	builder.
+		Build().
+		Start()
 }
