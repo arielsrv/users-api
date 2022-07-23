@@ -19,21 +19,19 @@ func main() {
 
 	builder := common.NewWebServerBuilder()
 
-	builder.
-		AddRoute("GET", "/users/:id", userController.GetUser).
-		AddRoute("GET", "/users", userController.GetUsers).
-		AddRoute("GET", "/ping", pingController.Ping)
+	builder.AddRoute("GET", "/ping", pingController.Ping)
+	builder.AddRoute("GET", "/users", userController.GetUsers)
+	builder.AddRoute("GET", "/users/:id", userController.GetUser)
 
-	builder.
-		EnableLog().
-		EnableRecover().
-		EnableNewRelic()
+	builder.UseLog()
+	builder.UseRecover()
+	builder.UseNewRelic()
 
 	address, port := os.LookupEnv("PORT")
 	if port {
 		builder.Listen(fmt.Sprintf(":%s", address))
 	} else {
-		builder.Listen(":3000")
+		builder.UseDefaultAddress()
 	}
 
 	_, prefork := os.LookupEnv("PREFORK")

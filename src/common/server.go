@@ -38,17 +38,17 @@ func NewWebServerBuilder() *WebServerBuilder {
 	}
 }
 
-func (builder *WebServerBuilder) EnableRecover() *WebServerBuilder {
+func (builder *WebServerBuilder) UseRecover() *WebServerBuilder {
 	builder.enableRecover = true
 	return builder
 }
 
-func (builder *WebServerBuilder) EnableLog() *WebServerBuilder {
+func (builder *WebServerBuilder) UseLog() *WebServerBuilder {
 	builder.enableLog = true
 	return builder
 }
 
-func (builder *WebServerBuilder) EnableNewRelic() *WebServerBuilder {
+func (builder *WebServerBuilder) UseNewRelic() *WebServerBuilder {
 	builder.enableNewRelic = true
 	return builder
 }
@@ -70,6 +70,11 @@ func (builder *WebServerBuilder) AddRoute(method string, path string, action fun
 
 func (builder *WebServerBuilder) Listen(address string) *WebServerBuilder {
 	builder.addr = address
+	return builder
+}
+
+func (builder *WebServerBuilder) UseDefaultAddress() *WebServerBuilder {
+	builder.addr = ":3000"
 	return builder
 }
 
