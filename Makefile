@@ -3,7 +3,7 @@
 
 build:
 	mkdir -p bin
-	go build -o bin ./...
+	$(shell cd src/ ; go build -a -o app ; cp app ../bin/app ; rm app)
 
 test:
 	go test ./...
