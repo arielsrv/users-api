@@ -25,10 +25,10 @@ func (server *WebServer) Start() {
 
 type WebServerBuilder struct {
 	routes         []Route
+	addr           string
 	enableLog      bool
 	enableNewRelic bool
 	enableRecover  bool
-	addr           string
 	prefork        bool
 }
 
