@@ -29,8 +29,8 @@ func (suite *UserControllerIntegrationSuite) SetupTest() {
 	userController := infrastructure.NewUserController(suite.userService)
 	builder := common.NewWebServerBuilder()
 	suite.app = builder.
-		AddRoute("GET", "/users/:id", userController.GetUser).
-		AddRoute("GET", "/users", userController.GetUsers).
+		AddRoute(http.MethodGet, "/users/:id", userController.GetUser).
+		AddRoute(http.MethodGet, "/users", userController.GetUsers).
 		Build().
 		App()
 }

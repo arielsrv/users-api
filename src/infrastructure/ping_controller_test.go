@@ -19,7 +19,7 @@ func (suite *PingControllerIntegrationSuite) SetupTest() {
 	pingController := NewPingController()
 	builder := common.NewWebServerBuilder()
 	suite.app = builder.
-		AddRoute("GET", "/ping", pingController.Ping).
+		AddRoute(http.MethodGet, "/ping", pingController.Ping).
 		Build().
 		App()
 }

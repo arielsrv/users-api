@@ -5,7 +5,7 @@ import (
 	"github.com/users-api/src/application"
 	"github.com/users-api/src/common"
 	"github.com/users-api/src/infrastructure"
-	"net/http"
+	http "net/http"
 	"os"
 )
 
@@ -19,9 +19,9 @@ func main() {
 
 	builder := common.NewWebServerBuilder()
 
-	builder.AddRoute("GET", "/ping", pingController.Ping)
-	builder.AddRoute("GET", "/users", userController.GetUsers)
-	builder.AddRoute("GET", "/users/:id", userController.GetUser)
+	builder.AddRoute(http.MethodGet, "/ping", pingController.Ping)
+	builder.AddRoute(http.MethodGet, "/users", userController.GetUsers)
+	builder.AddRoute(http.MethodGet, "/users/:id", userController.GetUser)
 
 	builder.UseLog()
 	builder.UseRecover()
