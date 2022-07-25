@@ -2,8 +2,9 @@
 .PHONY: coverage
 
 build:
-	mkdir -p bin
-	$(shell cd src/ ; go build -a -o app ; cp app ../bin/app ; rm app)
+	go mod tidy
+	/bin/bash -c \
+	"(mkdir -p bin ; cd src/ ; go build -o app ; mv app ../bin)"
 
 test:
 	go test ./...
@@ -22,8 +23,8 @@ upgrade:
 	go-mod-upgrade
 
 clean:
-	rm -rf bin
-	rm -rf coverage
+	rm -rf bin/
+	rm -rf coverage/
 
 all:
 	@make -s clean
