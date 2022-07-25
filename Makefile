@@ -2,7 +2,6 @@
 .PHONY: coverage
 
 build:
-	go mod tidy
 	/bin/bash -c \
 	"(mkdir -p bin ; cd src/ ; go build -o app ; mv app ../bin)"
 
@@ -19,6 +18,7 @@ coverage:
 	go tool cover -func=coverage/coverage.out
 
 upgrade:
+	go mod tidy
 	go install github.com/oligot/go-mod-upgrade@latest
 	go-mod-upgrade
 
