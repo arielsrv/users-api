@@ -5,7 +5,7 @@ import (
 )
 
 type IUserService interface {
-	GetUser(id int) (*UserDto, error)
+	GetById(id int) (*UserDto, error)
 	GetAll() ([]UserDto, error)
 }
 type UserService struct {
@@ -16,8 +16,8 @@ func NewUserService(userRepository domain.UserRepository) *UserService {
 	return &UserService{userRepository: userRepository}
 }
 
-func (service UserService) GetUser(id int) (*UserDto, error) {
-	user, err := service.userRepository.GetUser(id)
+func (service UserService) GetById(id int) (*UserDto, error) {
+	user, err := service.userRepository.GetById(id)
 	if err != nil {
 		return nil, err
 	}

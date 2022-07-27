@@ -35,7 +35,7 @@ func (suite *UserControllerIntegrationSuite) SetupTest() {
 		App()
 }
 
-func (mock *MockUserService) GetUser(int) (*application.UserDto, error) {
+func (mock *MockUserService) GetById(int) (*application.UserDto, error) {
 	args := mock.Called()
 	result := args.Get(0)
 	return result.(*application.UserDto), nil
@@ -52,7 +52,7 @@ func TestIntegration(t *testing.T) {
 }
 
 func (suite *UserControllerIntegrationSuite) Test_Get_User_By_Id() {
-	suite.userService.On("GetUser").Return(GetUser())
+	suite.userService.On("GetById").Return(GetUser())
 
 	request := httptest.NewRequest("GET", "/users/1", nil)
 	response, err := suite.app.Test(request)
@@ -65,7 +65,7 @@ func (suite *UserControllerIntegrationSuite) Test_Get_User_By_Id() {
 }
 
 func (suite *UserControllerIntegrationSuite) Test_Get_User_By_Id_Bad_Request() {
-	suite.userService.On("GetUser").Return(GetUser())
+	suite.userService.On("GetById").Return(GetUser())
 
 	request := httptest.NewRequest("GET", "/users/a", nil)
 	response, err := suite.app.Test(request)
