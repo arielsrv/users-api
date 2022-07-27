@@ -9,7 +9,7 @@ import (
 
 type IUserController interface {
 	GetUser(ctx *fiber.Ctx) error
-	GetUsers(ctx *fiber.Ctx) error
+	GetAll(ctx *fiber.Ctx) error
 }
 
 type UserController struct {
@@ -39,10 +39,10 @@ func NewBadRequest(message string) error {
 	return err
 }
 
-func (userController UserController) GetUsers(ctx *fiber.Ctx) error {
+func (userController UserController) GetAll(ctx *fiber.Ctx) error {
 	result, err := userController.
 		userService.
-		GetUsers()
+		GetAll()
 
 	if err != nil {
 		return err

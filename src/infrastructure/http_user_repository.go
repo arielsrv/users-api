@@ -23,7 +23,7 @@ func (repository HTTPUserRepository) GetUser(userID int) (*domain.User, error) {
 	return &user, err
 }
 
-func (repository HTTPUserRepository) GetUsers() ([]domain.User, error) {
+func (repository HTTPUserRepository) GetAll() ([]domain.User, error) {
 	url := fmt.Sprintf("%s/users", repository.baseURL)
 	users, err := Client[[]domain.User]{repository.client}.Get(url)
 	return users, err

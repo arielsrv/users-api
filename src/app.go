@@ -20,7 +20,7 @@ func main() {
 	builder := common.NewWebServerBuilder()
 
 	builder.AddRoute(http.MethodGet, "/ping", pingController.Ping)
-	builder.AddRoute(http.MethodGet, "/users", userController.GetUsers)
+	builder.AddRoute(http.MethodGet, "/users", userController.GetAll)
 	builder.AddRoute(http.MethodGet, "/users/:id", userController.GetUser)
 
 	builder.UseLog()

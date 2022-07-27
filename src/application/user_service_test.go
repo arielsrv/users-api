@@ -44,7 +44,7 @@ func (mock *MockUserRepository) GetUser(int) (*domain.User, error) {
 	return result.(*domain.User), nil
 }
 
-func (mock *MockUserRepository) GetUsers() ([]domain.User, error) {
+func (mock *MockUserRepository) GetAll() ([]domain.User, error) {
 	args := mock.Called()
 	result := args.Get(0)
 	return result.([]domain.User), nil
@@ -55,7 +55,7 @@ func (mock *MockUserErrorRepository) GetUser(int) (*domain.User, error) {
 	return args.Get(0).(*domain.User), args.Get(1).(error)
 }
 
-func (mock *MockUserErrorRepository) GetUsers() ([]domain.User, error) {
+func (mock *MockUserErrorRepository) GetAll() ([]domain.User, error) {
 	args := mock.Called()
 	return args.Get(0).([]domain.User), args.Get(1).(error)
 }
@@ -82,9 +82,9 @@ func (suite *UserServiceUnitTestSuite) TestGetError() {
 }
 
 func (suite *UserServiceUnitTestSuite) TestGetUsersError() {
-	suite.userErrorRepository.On("GetUsers").Return(GetUsersError())
+	suite.userErrorRepository.On("GetAll").Return(GetUsersError())
 
-	actual, err := suite.userErrorService.GetUsers()
+	actual, err := suite.userErrorService.GetAll()
 
 	suite.Nil(actual)
 	suite.Error(err)
@@ -99,9 +99,9 @@ func GetUsersError() ([]domain.User, error) {
 }
 
 func (suite *UserServiceUnitTestSuite) TestGetUsers() {
-	suite.userRepository.On("GetUsers").Return(GetUsers())
+	suite.userRepository.On("GetAll").Return(GetUsers())
 
-	actual, err := suite.userService.GetUsers()
+	actual, err := suite.userService.GetAll()
 
 	suite.NotNil(actual)
 	suite.NoError(err)

@@ -30,7 +30,7 @@ func (suite *UserControllerIntegrationSuite) SetupTest() {
 	builder := common.NewWebServerBuilder()
 	suite.app = builder.
 		AddRoute(http.MethodGet, "/users/:id", userController.GetUser).
-		AddRoute(http.MethodGet, "/users", userController.GetUsers).
+		AddRoute(http.MethodGet, "/users", userController.GetAll).
 		Build().
 		App()
 }
@@ -41,7 +41,7 @@ func (mock *MockUserService) GetUser(int) (*application.UserDto, error) {
 	return result.(*application.UserDto), nil
 }
 
-func (mock *MockUserService) GetUsers() ([]application.UserDto, error) {
+func (mock *MockUserService) GetAll() ([]application.UserDto, error) {
 	args := mock.Called()
 	result := args.Get(0)
 	return result.([]application.UserDto), nil
@@ -76,7 +76,7 @@ func (suite *UserControllerIntegrationSuite) Test_Get_User_By_Id_Bad_Request() {
 }
 
 func (suite *UserControllerIntegrationSuite) Test_Get_Users() {
-	suite.userService.On("GetUsers").Return(GetUsers())
+	suite.userService.On("GetAll").Return(GetUsers())
 
 	request := httptest.NewRequest("GET", "/users", nil)
 	response, err := suite.app.Test(request)

@@ -63,7 +63,7 @@ func (suite *HTTPUserRepositoryUnitSuite) TestGet() {
 func (suite *HTTPUserRepositoryUnitSuite) TestGetUsers() {
 	suite.client.On("Get").Return(GetUsers())
 
-	actual, err := suite.userRepository.GetUsers()
+	actual, err := suite.userRepository.GetAll()
 
 	suite.NotNil(actual)
 	suite.NoError(err)
