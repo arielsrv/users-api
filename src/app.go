@@ -5,7 +5,7 @@ import (
 	"github.com/users-api/src/application"
 	"github.com/users-api/src/common"
 	"github.com/users-api/src/infrastructure"
-	http "net/http"
+	"net/http"
 	"os"
 )
 

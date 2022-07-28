@@ -29,7 +29,7 @@ func (userController UserController) GetUser(ctx *fiber.Ctx) error {
 
 	result, _ := userController.
 		userService.
-		GetById(userID)
+		GetByID(userID)
 
 	return ctx.JSON(result)
 }

@@ -38,7 +38,7 @@ func (suite *UserServiceUnitTestSuite) SetupTest() {
 	suite.userErrorService = application.NewUserService(suite.userErrorRepository)
 }
 
-func (mock *MockUserRepository) GetById(int) (*domain.User, error) {
+func (mock *MockUserRepository) GetByID(int) (*domain.User, error) {
 	args := mock.Called()
 	result := args.Get(0)
 	return result.(*domain.User), nil
@@ -50,7 +50,7 @@ func (mock *MockUserRepository) GetAll() ([]domain.User, error) {
 	return result.([]domain.User), nil
 }
 
-func (mock *MockUserErrorRepository) GetById(int) (*domain.User, error) {
+func (mock *MockUserErrorRepository) GetByID(int) (*domain.User, error) {
 	args := mock.Called()
 	return args.Get(0).(*domain.User), args.Get(1).(error)
 }
@@ -61,9 +61,9 @@ func (mock *MockUserErrorRepository) GetAll() ([]domain.User, error) {
 }
 
 func (suite *UserServiceUnitTestSuite) TestGetUser() {
-	suite.userRepository.On("GetById").Return(GetUser())
+	suite.userRepository.On("GetByID").Return(GetUser())
 
-	actual, err := suite.userService.GetById(1)
+	actual, err := suite.userService.GetByID(1)
 
 	suite.NotNil(actual)
 	suite.NoError(err)
@@ -73,9 +73,9 @@ func (suite *UserServiceUnitTestSuite) TestGetUser() {
 }
 
 func (suite *UserServiceUnitTestSuite) TestGetError() {
-	suite.userErrorRepository.On("GetById").Return(GetUserError())
+	suite.userErrorRepository.On("GetByID").Return(GetUserError())
 
-	actual, err := suite.userErrorService.GetById(1)
+	actual, err := suite.userErrorService.GetByID(1)
 
 	suite.Nil(actual)
 	suite.Error(err)

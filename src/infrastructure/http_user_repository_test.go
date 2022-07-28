@@ -51,7 +51,7 @@ func (mock *MockErrorClient) Get(string) (response *http.Response, err error) {
 func (suite *HTTPUserRepositoryUnitSuite) TestGet() {
 	suite.client.On("Get").Return(Get())
 
-	actual, err := suite.userRepository.GetById(1)
+	actual, err := suite.userRepository.GetByID(1)
 
 	suite.NotNil(actual)
 	suite.NoError(err)
@@ -100,7 +100,7 @@ func GetUsers() (*http.Response, error) {
 func (suite *HTTPUserRepositoryUnitSuite) TestError() {
 	suite.errorClient.On("Get").Return(GetError())
 
-	_, err := suite.userErrorRepository.GetById(1)
+	_, err := suite.userErrorRepository.GetByID(1)
 
 	suite.Error(err)
 }
@@ -108,7 +108,7 @@ func (suite *HTTPUserRepositoryUnitSuite) TestError() {
 func (suite *HTTPUserRepositoryUnitSuite) TestNotOk() {
 	suite.client.On("Get").Return(GetNotFound())
 
-	_, err := suite.userRepository.GetById(1)
+	_, err := suite.userRepository.GetByID(1)
 
 	suite.Error(err)
 }

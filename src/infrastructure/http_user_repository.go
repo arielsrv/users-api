@@ -17,7 +17,7 @@ func NewHTTPUserRepository(client HTTPClient) *HTTPUserRepository {
 	}
 }
 
-func (repository HTTPUserRepository) GetById(userID int) (*domain.User, error) {
+func (repository HTTPUserRepository) GetByID(userID int) (*domain.User, error) {
 	url := fmt.Sprintf("%s/users/%d", repository.baseURL, userID)
 	user, err := Client[domain.User]{repository.client}.Get(url)
 	return &user, err
