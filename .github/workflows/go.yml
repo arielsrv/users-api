@@ -24,8 +24,18 @@ jobs:
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v3.2.0
 
-      - name: Test
-        run: go test -v ./...
+      - name: Set up gotestfmt
+        uses: haveyoudebuggedit/gotestfmt-action@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up gotestfmt
+        run: go install github.com/haveyoudebuggedit/gotestfmt/v2/cmd/gotestfmt@latest
+
+      - name: Run pretty tests
+        run: |
+          set -euo pipefail
+          go test -json -v ./... 2>&1 | tee /tmp/gotest.log | gotestfmt
 
       - name: Run Test
         run: |
