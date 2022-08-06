@@ -19,8 +19,8 @@ type HTTPClientUnitSuite struct {
 func (suite *HTTPClientUnitSuite) SetupTest() {
 	suite.client = new(MockHTTPClient)
 	suite.errorClient = new(MockHTTPErrorClient)
-	suite.proxy = NewHTTPClientProxy(suite.client)
-	suite.errorProxy = NewHTTPClientProxy(suite.errorClient)
+	suite.proxy = NewHTTPClientProxy(suite.client, "users")
+	suite.errorProxy = NewHTTPClientProxy(suite.errorClient, "users")
 }
 
 func TestHttpClientUnit(t *testing.T) {

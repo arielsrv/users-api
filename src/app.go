@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	httpClientProxy := infrastructure.NewHTTPClientProxy(&http.Client{})
+	httpClientProxy := infrastructure.NewHTTPClientProxy(&http.Client{}, "users")
 	userRepository := infrastructure.NewHTTPUserRepository(httpClientProxy)
 	userService := application.NewUserService(userRepository)
 	userController := infrastructure.NewUserController(userService)
