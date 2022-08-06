@@ -2,6 +2,7 @@ package application
 
 import (
 	"github.com/users-api/src/domain"
+	"net/http"
 )
 
 type IUserService interface {
@@ -31,17 +32,14 @@ func (service UserService) MultiGetByID(ids []int) (*[]MultiGetDto[UserDto], err
 	var result []MultiGetDto[UserDto]
 
 	for _, id := range ids {
-		user, err := service.GetByID(id)
-		if err != nil {
-			return nil, err
-		}
+		user, _ := service.GetByID(id)
 		channel <- user
 	}
 	close(channel)
 
 	for userDto := range channel {
 		result = append(result, MultiGetDto[UserDto]{
-			Code: 200,
+			Code: http.StatusOK,
 			Body: *userDto,
 		})
 	}
