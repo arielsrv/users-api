@@ -5,9 +5,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
-	"github.com/newrelic/go-agent/v3/newrelic"
 	"github.com/nobuyo/nrfiber"
-	"os"
 )
 
 type WebServer struct {
@@ -98,14 +96,8 @@ func (builder *WebServerBuilder) Build() *WebServer {
 	}
 
 	if builder.enableNewRelic {
-		nrapp, _ := newrelic.NewApplication(
-			newrelic.ConfigAppName("golang-users-api"),
-			newrelic.ConfigLicense(os.Getenv("NEW_RELIC_LICENSE_KEY")),
-			newrelic.ConfigDebugLogger(os.Stdout),
-		)
-
 		app.Use(nrfiber.New(nrfiber.Config{
-			NewRelicApp: nrapp,
+			NewRelicApp: GetMetricCollector().nrapp,
 		}))
 	}
 

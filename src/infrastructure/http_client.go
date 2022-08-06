@@ -4,16 +4,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
-	"github.com/newrelic/go-agent/v3/newrelic"
+	"github.com/users-api/src/common"
 	"io"
 	"net/http"
-	"os"
 	"time"
 )
 
 type HTTPClient interface {
 	Get(url string) (response *http.Response, err error)
 }
+
+var nrapp = common.GetMetricCollector()
 
 type HTTPClientProxy struct {
 	client HTTPClient
@@ -31,13 +32,8 @@ func (customHttpClient HTTPClientProxy) Get(url string) (response *http.Response
 	var start = time.Now()
 	response, err = customHttpClient.client.Get(url)
 	var end = time.Since(start)
-	nrapp, _ := newrelic.NewApplication(
-		newrelic.ConfigAppName("golang-users-api"),
-		newrelic.ConfigLicense(os.Getenv("NEW_RELIC_LICENSE_KEY")),
-		newrelic.ConfigDebugLogger(os.Stdout),
-	)
 	metric := fmt.Sprintf("%s-client", customHttpClient.name)
-	nrapp.RecordCustomMetric(metric, float64(end))
+	nrapp.Record(metric, float64(end))
 	return response, err
 }
 
