@@ -14,7 +14,7 @@ type HTTPClient interface {
 	Get(url string) (response *http.Response, err error)
 }
 
-var nrapp = common.GetMetricCollector()
+var metricCollector = common.GetMetricCollector()
 
 type HTTPClientProxy struct {
 	client HTTPClient
@@ -33,7 +33,7 @@ func (customHttpClient HTTPClientProxy) Get(url string) (response *http.Response
 	response, err = customHttpClient.client.Get(url)
 	var end = time.Since(start)
 	metric := fmt.Sprintf("%s-client", customHttpClient.name)
-	nrapp.Record(metric, float64(end))
+	go metricCollector.Record(metric, float64(end.Milliseconds()))
 	return response, err
 }
 
