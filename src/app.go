@@ -21,6 +21,7 @@ func main() {
 
 	builder.AddRoute(http.MethodGet, "/ping", pingController.Ping)
 	builder.AddRoute(http.MethodGet, "/users", userController.GetAll)
+	builder.AddRoute(http.MethodGet, "/users/multi-get", userController.MultiGet)
 	builder.AddRoute(http.MethodGet, "/users/:id", userController.GetUser)
 
 	builder.UseLog()

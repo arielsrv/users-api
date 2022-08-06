@@ -4,7 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/suite"
 	"github.com/users-api/src/common"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -31,7 +31,7 @@ func TestIntegration(t *testing.T) {
 func (suite *PingControllerIntegrationSuite) TestPing() {
 	request := httptest.NewRequest("GET", "/ping", nil)
 	response, err := suite.app.Test(request)
-	body, _ := ioutil.ReadAll(response.Body)
+	body, _ := io.ReadAll(response.Body)
 	suite.NotNil(response)
 	suite.NoError(err)
 	suite.Equal(http.StatusOK, response.StatusCode)

@@ -5,11 +5,14 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/users-api/src/application"
 	"net/http"
+	"strconv"
+	"strings"
 )
 
 type IUserController interface {
 	GetUser(ctx *fiber.Ctx) error
 	GetAll(ctx *fiber.Ctx) error
+	MultiGet(ctx *fiber.Ctx) error
 }
 
 type UserController struct {
@@ -30,6 +33,24 @@ func (userController UserController) GetUser(ctx *fiber.Ctx) error {
 	result, _ := userController.
 		userService.
 		GetByID(userID)
+
+	return ctx.JSON(result)
+}
+
+func (userController UserController) MultiGet(ctx *fiber.Ctx) error {
+	param := strings.Split(ctx.Query("ids"), ",")
+	var ids = make([]int, 0)
+	for _, id := range param {
+		value, err := strconv.Atoi(id)
+		if err != nil {
+			return err
+		}
+		ids = append(ids, value)
+	}
+
+	result, _ := userController.
+		userService.
+		MultiGetByID(ids)
 
 	return ctx.JSON(result)
 }
