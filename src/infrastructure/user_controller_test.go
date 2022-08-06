@@ -2,7 +2,7 @@ package infrastructure_test
 
 import (
 	"github.com/users-api/src/infrastructure"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -47,6 +47,12 @@ func (mock *MockUserService) GetAll() ([]application.UserDto, error) {
 	return result.([]application.UserDto), nil
 }
 
+func (mock *MockUserService) MultiGetByID([]int) (*[]application.MultiGetDto[application.UserDto], error) {
+	args := mock.Called()
+	result := args.Get(0)
+	return result.(*[]application.MultiGetDto[application.UserDto]), nil
+}
+
 func TestIntegration(t *testing.T) {
 	suite.Run(t, new(UserControllerIntegrationSuite))
 }
@@ -56,7 +62,7 @@ func (suite *UserControllerIntegrationSuite) Test_Get_User_By_Id() {
 
 	request := httptest.NewRequest("GET", "/users/1", nil)
 	response, err := suite.app.Test(request)
-	body, _ := ioutil.ReadAll(response.Body)
+	body, _ := io.ReadAll(response.Body)
 
 	suite.NotNil(response)
 	suite.NoError(err)
@@ -80,7 +86,7 @@ func (suite *UserControllerIntegrationSuite) Test_Get_Users() {
 
 	request := httptest.NewRequest("GET", "/users", nil)
 	response, err := suite.app.Test(request)
-	body, _ := ioutil.ReadAll(response.Body)
+	body, _ := io.ReadAll(response.Body)
 
 	suite.NotNil(response)
 	suite.NoError(err)

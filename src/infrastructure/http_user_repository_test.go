@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"github.com/users-api/src/domain"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 )
@@ -93,7 +93,7 @@ func GetUsers() (*http.Response, error) {
 	binary, _ := json.Marshal(users)
 	return &http.Response{
 		StatusCode: 200,
-		Body:       ioutil.NopCloser(bytes.NewBuffer(binary)),
+		Body:       io.NopCloser(bytes.NewBuffer(binary)),
 	}, nil
 }
 
@@ -126,6 +126,6 @@ func Get() (*http.Response, error) {
 	binary, _ := json.Marshal(user)
 	return &http.Response{
 		StatusCode: 200,
-		Body:       ioutil.NopCloser(bytes.NewBuffer(binary)),
+		Body:       io.NopCloser(bytes.NewBuffer(binary)),
 	}, nil
 }
