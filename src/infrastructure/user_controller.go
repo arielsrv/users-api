@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/users-api/src/application"
+	"github.com/users-api/src/common"
 	"net/http"
-	"strconv"
-	"strings"
 )
 
 type IUserController interface {
@@ -26,8 +25,7 @@ func NewUserController(userService application.IUserService) *UserController {
 func (userController UserController) GetUser(ctx *fiber.Ctx) error {
 	userID, err := ctx.ParamsInt("id")
 	if err != nil {
-		err := NewBadRequest(fmt.Sprintf("Invalid format for userId, %s", ctx.Params("id")))
-		return err
+		return NewBadRequest(fmt.Sprintf("Invalid format for userId, %s", ctx.Params("id")))
 	}
 
 	result, _ := userController.
@@ -38,14 +36,14 @@ func (userController UserController) GetUser(ctx *fiber.Ctx) error {
 }
 
 func (userController UserController) MultiGet(ctx *fiber.Ctx) error {
-	param := strings.Split(ctx.Query("ids"), ",")
-	var ids = make([]int, 0)
-	for _, id := range param {
-		value, err := strconv.Atoi(id)
-		if err != nil {
-			return err
-		}
-		ids = append(ids, value)
+	param := ctx.Query("ids")
+	if common.IsEmptyString(param) {
+		return NewBadRequest(fmt.Sprintf("Invalid format for ids."))
+	}
+
+	ids, err := common.ToEnumerableIds(param)
+	if err != nil {
+		return NewBadRequest(fmt.Sprintf("Invalid format for ids."))
 	}
 
 	result, _ := userController.

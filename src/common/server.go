@@ -88,6 +88,12 @@ func (builder *WebServerBuilder) Build() *WebServer {
 		EnablePrintRoutes: false,
 	})
 
+	app.Use(requestid.New())
+
+	app.Use(logger.New(logger.Config{
+		Format: "${pid} ${locals:requestid} ${status} - ${method} ${path}\n",
+	}))
+
 	if builder.enableLog {
 		app.Use(requestid.New())
 		app.Use(logger.New(logger.Config{
