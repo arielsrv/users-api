@@ -38,12 +38,12 @@ func (userController UserController) GetUser(ctx *fiber.Ctx) error {
 func (userController UserController) MultiGet(ctx *fiber.Ctx) error {
 	param := ctx.Query("ids")
 	if common.IsEmptyString(param) {
-		return NewBadRequest(fmt.Sprintf("Invalid format for ids."))
+		return NewBadRequest("Invalid format for ids.")
 	}
 
 	ids, err := common.ToEnumerableIds(param)
 	if err != nil {
-		return NewBadRequest(fmt.Sprintf("Invalid format for ids."))
+		return NewBadRequest("Invalid format for ids.")
 	}
 
 	result, _ := userController.
