@@ -29,7 +29,7 @@ func TestIntegration(t *testing.T) {
 }
 
 func (suite *PingControllerIntegrationSuite) TestPing() {
-	request := httptest.NewRequest("GET", "/ping", nil)
+	request := httptest.NewRequest(http.MethodGet, "/ping", nil)
 	response, err := suite.app.Test(request)
 	body, _ := io.ReadAll(response.Body)
 	suite.NotNil(response)

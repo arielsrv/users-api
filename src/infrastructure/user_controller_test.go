@@ -60,7 +60,7 @@ func TestIntegration(t *testing.T) {
 func (suite *UserControllerIntegrationSuite) Test_Get_User_By_Id() {
 	suite.userService.On("GetByID").Return(GetUser())
 
-	request := httptest.NewRequest("GET", "/users/1", nil)
+	request := httptest.NewRequest(http.MethodGet, "/users/1", nil)
 	response, err := suite.app.Test(request)
 	body, _ := io.ReadAll(response.Body)
 
@@ -73,7 +73,7 @@ func (suite *UserControllerIntegrationSuite) Test_Get_User_By_Id() {
 func (suite *UserControllerIntegrationSuite) Test_Get_User_By_Id_Bad_Request() {
 	suite.userService.On("GetByID").Return(GetUser())
 
-	request := httptest.NewRequest("GET", "/users/a", nil)
+	request := httptest.NewRequest(http.MethodGet, "/users/a", nil)
 	response, err := suite.app.Test(request)
 
 	suite.NotNil(response)
@@ -84,7 +84,7 @@ func (suite *UserControllerIntegrationSuite) Test_Get_User_By_Id_Bad_Request() {
 func (suite *UserControllerIntegrationSuite) Test_Get_Users() {
 	suite.userService.On("GetAll").Return(GetUsers())
 
-	request := httptest.NewRequest("GET", "/users", nil)
+	request := httptest.NewRequest(http.MethodGet, "/users", nil)
 	response, err := suite.app.Test(request)
 	body, _ := io.ReadAll(response.Body)
 
