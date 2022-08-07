@@ -29,8 +29,9 @@ func (suite *UserControllerIntegrationSuite) SetupTest() {
 	userController := infrastructure.NewUserController(suite.userService)
 	builder := common.NewWebServerBuilder()
 	suite.app = builder.
-		AddRoute(http.MethodGet, "/users/:id", userController.GetUser).
 		AddRoute(http.MethodGet, "/users", userController.GetAll).
+		AddRoute(http.MethodGet, "/users/multi-get", userController.MultiGet).
+		AddRoute(http.MethodGet, "/users/:id", userController.GetUser).
 		Build().
 		App()
 }
@@ -47,10 +48,10 @@ func (mock *MockUserService) GetAll() ([]application.UserDto, error) {
 	return result.([]application.UserDto), nil
 }
 
-func (mock *MockUserService) MultiGetByID([]int) (*[]application.MultiGetDto[application.UserDto], error) {
+func (mock *MockUserService) MultiGetByID([]int) ([]application.MultiGetDto[application.UserDto], error) {
 	args := mock.Called()
 	result := args.Get(0)
-	return result.(*[]application.MultiGetDto[application.UserDto]), nil
+	return result.([]application.MultiGetDto[application.UserDto]), nil
 }
 
 func TestIntegration(t *testing.T) {
@@ -92,6 +93,49 @@ func (suite *UserControllerIntegrationSuite) Test_Get_Users() {
 	suite.NoError(err)
 	suite.Equal(http.StatusOK, response.StatusCode)
 	suite.Equal(`[{"id":1,"name":"John Doe","email":"john@doe.com"},{"id":2,"name":"John Foo","email":"john@foo.com"}]`, string(body))
+}
+
+func (suite *UserControllerIntegrationSuite) Test_MultiGet_Users() {
+	suite.userService.On("MultiGetByID").Return(GetMultiGetUsers())
+
+	request := httptest.NewRequest(http.MethodGet, "/users/multi-get?ids=1,2,,2", nil)
+	response, err := suite.app.Test(request)
+	body, _ := io.ReadAll(response.Body)
+
+	suite.NotNil(response)
+	suite.NoError(err)
+	suite.Equal(http.StatusOK, response.StatusCode)
+	suite.Equal(`[{"code":200,"body":{"id":1,"name":"John Doe","email":"john@doe.com"}},{"code":200,"body":{"id":2,"name":"John Foo","email":"john@foo.com"}}]`, string(body))
+}
+
+func (suite *UserControllerIntegrationSuite) Test_MultiGet_Users_BadRequest_1() {
+	suite.userService.On("MultiGetByID").Return(GetMultiGetUsers())
+
+	request := httptest.NewRequest(http.MethodGet, "/users/multi-get?ids=", nil)
+	response, err := suite.app.Test(request)
+
+	suite.NoError(err)
+	suite.Equal(http.StatusBadRequest, response.StatusCode)
+}
+
+func (suite *UserControllerIntegrationSuite) Test_MultiGet_Users_BadRequest_2() {
+	suite.userService.On("MultiGetByID").Return(GetMultiGetUsers())
+
+	request := httptest.NewRequest(http.MethodGet, "/users/multi-get?ids=a,1", nil)
+	response, err := suite.app.Test(request)
+
+	suite.NoError(err)
+	suite.Equal(http.StatusBadRequest, response.StatusCode)
+}
+
+func GetMultiGetUsers() []application.MultiGetDto[application.UserDto] {
+	usersDto := GetUsers()
+	result := make([]application.MultiGetDto[application.UserDto], 2)
+	result[0].Code = 200
+	result[0].Body = usersDto[0]
+	result[1].Code = 200
+	result[1].Body = usersDto[1]
+	return result
 }
 
 func GetUsers() []application.UserDto {

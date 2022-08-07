@@ -7,7 +7,7 @@ import (
 
 type IUserService interface {
 	GetByID(id int) (*UserDto, error)
-	MultiGetByID(ids []int) (*[]MultiGetDto[UserDto], error)
+	MultiGetByID(ids []int) ([]MultiGetDto[UserDto], error)
 	GetAll() ([]UserDto, error)
 }
 type UserService struct {
@@ -27,7 +27,7 @@ func (service UserService) GetByID(id int) (*UserDto, error) {
 	return &userDto, err
 }
 
-func (service UserService) MultiGetByID(ids []int) (*[]MultiGetDto[UserDto], error) {
+func (service UserService) MultiGetByID(ids []int) ([]MultiGetDto[UserDto], error) {
 	channel := make(chan *UserDto, len(ids))
 	var result []MultiGetDto[UserDto]
 
@@ -44,7 +44,7 @@ func (service UserService) MultiGetByID(ids []int) (*[]MultiGetDto[UserDto], err
 		})
 	}
 
-	return &result, nil
+	return result, nil
 }
 
 func (service UserService) GetAll() ([]UserDto, error) {
