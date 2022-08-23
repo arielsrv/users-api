@@ -11,6 +11,9 @@ test:
 lint:
 	$(shell golangci-lint run)
 
+gocritic:
+	gocritic check ./...
+
 coverage:
 	mkdir -p coverage
 	go test -v ./... -covermode=count -coverpkg=./... -coverprofile coverage/coverage.out
