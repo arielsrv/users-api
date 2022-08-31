@@ -3,7 +3,7 @@ module github.com/users-api
 go 1.18
 
 require (
-	github.com/gofiber/fiber/v2 v2.36.0
+	github.com/gofiber/fiber/v2 v2.37.0
 	github.com/newrelic/go-agent/v3 v3.18.1
 	github.com/nobuyo/nrfiber v0.0.2
 	github.com/stretchr/testify v1.8.0
@@ -17,7 +17,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/stretchr/objx v0.4.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/valyala/fasthttp v1.38.0 // indirect
+	github.com/valyala/fasthttp v1.39.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f // indirect
 	golang.org/x/sys v0.0.0-20220227234510-4e6760a101f9 // indirect
