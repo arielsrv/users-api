@@ -3,7 +3,7 @@ module github.com/users-api
 go 1.19
 
 require (
-	github.com/gofiber/fiber/v2 v2.37.1
+	github.com/gofiber/fiber/v2 v2.38.1
 	github.com/newrelic/go-agent/v3 v3.19.2
 	github.com/nobuyo/nrfiber v0.0.2
 	github.com/stretchr/testify v1.8.0
